@@ -1,13 +1,22 @@
 {% extends 'ltuser/user_base.tpl' %}
 {% block content %}
-        <div class="team-list">
-        {% for team in teams %}
-        <div class="team-item">
-            <div class="team-leader">{{team.leader}}</div>
-            <div class="team-member">{{team.member}}</div>
-            <div class="team-date">{{team.date|date:"Y-m-d"}}</div>
-            <div class="team-description">{{team.description}}</div>
-        </div>
+{% if not teams %}
+    <div class="alert alert-warning">你还没有参加任何团队哦</div>
+{% endif %}
+
+<div class="team-list">
+{% for team in teams %}
+<div class="team-item">
+    <div class="team-name">{{team.name}}</div>
+    <div class="team-leader">Leader：{{team.leader}}</div>
+    <div class="team-member">成员：
+        {% for member in team.member.all %}
+        <a href="{% url user_space pk=member.ltuser.id %}">{{member.username}}  </a>
         {% endfor %}
-        </div>
+    </div>
+    <div class="team-date">创建日期：{{team.date|date:"Y-m-d"}}</div>
+    <div class="team-description">简介：{{team.description}}</div>
+</div>
+{% endfor %}
+</div>
 {% endblock %}

@@ -8,7 +8,7 @@ class ActivityCreateForm(LtModelForm):
 
     class Meta:
         model = Activity
-        fields = ("name","introduction","date","place","price","category")
+        fields = ("name","introduction","date","place","price")
 
     #TODO
     # default creater use login user

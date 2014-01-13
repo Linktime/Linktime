@@ -97,7 +97,7 @@
               {% if not user.is_authenticated %}
             <li><a href="{% url login %}">登录</a></li>
               {% else %}
-              <li><a>{{user.username}}</a></li>
+              <li><a href="{% url user_info pk=user.ltuser.id %}">{{user.username}}</a></li>
               <li><a href="{% url logout %}">注销</a></li>
               {% endif %}
               {% block navbar_right_li %} {% endblock %}
@@ -124,7 +124,7 @@
     {% block js_footer %}
     {% endblock %}
 <br>
-    <p>IE内核的浏览器（包括但不限于IE，360浏览器）无法表现本站所有效果，推荐使用Firefox,Chrome或Opera等浏览器的较新版本可得到最佳浏览效果<br>IE6及更老的浏览器本站均不做支持</p><p>©  2013 LinkTime </p><p>Author: <a href="http://www.renren.com/316795990/profile" target="_blank">Yang Fan</a>
+    <p>IE内核的浏览器（包括但不限于IE，360浏览器）无法表现本站所有效果，推荐使用Firefox,Chrome或Opera等浏览器的较新版本可得到最佳浏览效果<br>IE6及更老的浏览器本站均不做支持</p><p>©  2013-2014 LinkTime </p><p>Author: <a href="http://www.renren.com/316795990/profile" target="_blank">Yang Fan</a>
 </div>
 
 </body>

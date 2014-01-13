@@ -12,7 +12,7 @@ from django.views.generic.list import MultipleObjectMixin
 from django.core.urlresolvers import reverse
 
 from ltuser.models import Ltuser, MessageBoard
-from activity.models import Team
+from activity.models import Team, Activity
 from ltuser.forms import RegisterForm, LoginForm
 
 def index(request):
@@ -58,7 +58,23 @@ class MultipleObjectMixinByMember(MultipleObjectMixin):
         queryset_by_user = queryset.filter(member=self.request.user)
         return queryset_by_user
 
+class MultipleObjectMixinByParticipant(MultipleObjectMixin):
+    """
+    This mixin filters the queryset in a list-view by request.user
+    """
+    def get_queryset(self):
+        queryset = super(MultipleObjectMixinByParticipant, self).get_queryset()
+        queryset_by_user = queryset.filter(participant=self.request.user)
+        return queryset_by_user
+
+class UserSpace(DetailView):
+    # For other people
+    model = Ltuser
+    template_name = 'ltuser/user_space.tpl'
+    context_object_name = 'ltuser'
+
 class UserInfo(SingleObjectMixinByUser,DetailView):
+    # For user himself/herself
     model = Ltuser
     template_name = 'ltuser/user_info.tpl'
     context_object_name = 'ltuser'
@@ -67,6 +83,11 @@ class UserTeam(MultipleObjectMixinByMember,ListView):
     model = Team
     template_name = 'ltuser/user_team.tpl'
     context_object_name = 'teams'
+
+class UserActivity(MultipleObjectMixinByParticipant,ListView):
+    model = Activity
+    template_name = 'ltuser/user_activity.tpl'
+    context_object_name = 'activitys'
 
 class UserMessageBoard(ListView):
     model = MessageBoard

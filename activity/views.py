@@ -113,6 +113,28 @@ def activity_join_cancel(request, pk):
         messages.error(request, u'您要取消参加的活动不存在，请重新确认！')
     return HttpResponseRedirect(reverse('activity_detail', kwargs={'pk': pk}))
 
+@login_required()
+def activity_mark(request,pk):
+    try:
+        user = request.user
+        activity = Activity.objects.get(id=pk)
+        activity.marker.add(user)
+        messages.info(request, u'你已成功收藏！')
+    except Activity.DoesNotExist:
+        messages.success(request, u'您要收藏的活动不存在，请重新确认！')
+    return HttpResponseRedirect(reverse('activity_detail', kwargs={'pk': pk}))
+
+@login_required()
+def activity_mark_cancel(request,pk):
+    try:
+        user = request.user
+        activity = Activity.objects.get(id=pk)
+        activity.marker.remove(user)
+        messages.info(request, u'你已取消收藏！')
+    except Activity.DoesNotExist:
+        messages.error(request, u'您要取消收藏的活动不存在，请重新确认！')
+    return HttpResponseRedirect(reverse('activity_detail', kwargs={'pk': pk}))
+
 
 @login_required()
 def activity_support(request, pk):

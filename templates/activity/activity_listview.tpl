@@ -6,7 +6,8 @@
 <div class="activity-item" >
     <div class="activity-title" >活动名称:<a href="{% url activity_detail pk=activity.id %}" title="详情" >{{activity.name}}</a>
         <div class="activity-action">
-            <a class="btn btn-primary btn-xs" href="{% url activity_join pk=activity.id %}">参加</a>
+            <a class="btn btn-info btn-xs" href="{% url activity_join pk=activity.id %}">参加</a>
+            <a class="btn btn-primary btn-xs" href="{% url activity_mark pk=activity.id %}">收藏</a>
             <a class="btn btn-warning btn-xs">赞助</a>
         </div>
     </div>
@@ -37,8 +38,4 @@
     </div>
     {% endif %}
             </div>
-
-        <!--<div class="col-md-3 side">-->
-            <!--<p>This is side!</p>-->
-        <!--</div>-->
 {% endblock %}

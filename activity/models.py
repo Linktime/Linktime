@@ -33,16 +33,19 @@ class Activity(models.Model):
     name = models.CharField(max_length=30)
     introduction = models.TextField()
     date = models.DateField() #活动举办时间，应为DateTime类型，待改
+    time = models.TimeField()
     create_date = models.DateTimeField(auto_now_add=True)
     place = models.CharField(max_length=30)
     price = models.IntegerField()
-    category = models.CharField(max_length=30,null=True,blank=True)
-    # tag = models.ForeignKey('ActivityTag',null=True,blank=True)
+    # category = models.CharField(max_length=30,null=True,blank=True)
+    tag = models.ForeignKey('ActivityTag',null=True,blank=True)
+    preparing = models.BooleanField(default=True)
     #FIXME The follow field should allow add as a group
-    creator = models.ForeignKey(User,related_name='activity_creater')
+    creator = models.ForeignKey(User,related_name='activity_creator')
     organizer = models.ManyToManyField(User,related_name="activity_organizer")
-    sponsor = models.ManyToManyField(User,related_name="activity_sponsor",null=True,blank=True)
-    participant = models.ManyToManyField(User,related_name="activity_participant",null=True,blank=True)
+    marker = models.ManyToManyField(User,related_name="activity_marker",blank=True)
+    sponsor = models.ManyToManyField(User,related_name="activity_sponsor",blank=True)
+    participant = models.ManyToManyField(User,related_name="activity_participant",blank=True)
 
     def __unicode__(self):
         return u"%s" % self.name

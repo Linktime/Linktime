@@ -15,6 +15,8 @@
         {% include 'ltuser/user_side.tpl' %}
     {% endblock %}
 
+    <div class="col-md-8">
     {% block content %}
     {% endblock %}
+    </div>
 {% endblock %}
