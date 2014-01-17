@@ -1,5 +1,6 @@
 from django.contrib import admin
-from ltuser.models import Ltuser, Group, Message, MessageBoard
+from ltuser.models import Ltuser, Message, MessageBoard
+from friend.models import Group
 
 admin.site.register(Ltuser)
 admin.site.register(Group)

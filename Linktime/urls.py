@@ -13,6 +13,7 @@ urlpatterns = patterns('',
     url(r'^logout/$','ltuser.views.ltlogout',name="logout"),
     url(r'^user/',include('ltuser.urls')),
     url(r'^activity/',include('activity.urls')),
+    url(r'^friend/',include('friend.urls')),
     # Examples:
     # url(r'^$', 'Linktime.views.home', name='home'),
     # url(r'^Linktime/', include('Linktime.foo.urls')),

@@ -1,3 +1,4 @@
+# -*- coding:utf-8 -*-
 from django.db import models
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
@@ -6,6 +7,7 @@ from django.core.urlresolvers import reverse
 
 from django.contrib.auth.models import User
 from activity.models import Activity
+from friend.models import Group
 from ltuser.models import Message, MessageBoard
 # Create your models here.
 
@@ -16,7 +18,7 @@ class Notice(models.Model):
     # content_object = generic.GenericForeignKey('content_type', 'object_id')
     had_read = models.BooleanField(default=False)
     event = models.CharField(max_length=30)
-    url = models.URLField()
+    url = models.URLField(null=True,blank=True)
 
 
 class ActivityNotice(Notice):
@@ -33,6 +35,38 @@ class UserMessageNotice(Notice):
     sender = models.ForeignKey(User)
     def __unicode__(self):
         return "%s--activity--%s"%(self.receiver,self.sender)
+
+class IsAcceptFriendNotice(Notice):
+    # event should be friend_accept or friend_refuse
+    sender = models.ForeignKey(User)
+    def __unicode__(self):
+        return "%s--friend--%s"%(self.receiver,self.sender)
+
+class NewFriendNotice(Notice):
+    # event should be friend_new
+    sender = models.ForeignKey(User)
+    accept = models.NullBooleanField(null=True,blank=True)
+    group_name = models.CharField(max_length=30)
+    def __unicode__(self):
+        return "%s--friend--%s"%(self.receiver,self.sender)
+
+    def refuse(self):
+        if self.had_read == False:
+            self.had_read = True
+            self.accept = False
+            self.save()
+            afn = IsAcceptFriendNotice.objects.create(receiver=self.sender,sender=self.receiver,event=u"friend_refuse")
+
+    def accept(self,receiver_group_name=u"未分组"):
+        if self.had_read == False:
+            self.accept = True
+            self.had_read = True
+            self.save()
+            sender_group = Group.objects.get(name=self.group_name,owner=self.sender)
+            sender_group.member.add(self.receiver)
+            receiver_group = Group.objects.get(name=receiver_group_name,owner=self.receiver)
+            receiver_group.member.add(self.sender)
+            afn = IsAcceptFriendNotice.objects.create(receiver=self.sender,sender=self.receiver,event=u"friend_accept")
 
 def user_message(sender,**kwargs):
     if kwargs['created'] == True:

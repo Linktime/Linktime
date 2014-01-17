@@ -76,7 +76,7 @@
           <ul class="nav navbar-nav navbar-left">
             {% if user.is_authenticated %}<li><a href="{% url user_info pk=user.ltuser.id %}">个人空间</a></li>{% endif %}
             <li><a href="{% url activity_list %}">活动</a></li>
-            <li><a href="#">好友</a></li>
+            <li><a href="{% url group_list %}">好友</a></li>
             {% block navbar_left_li %} {% endblock %}
             <li><a href="{% url activity_create %}">创建活动</a></li>
           </ul>

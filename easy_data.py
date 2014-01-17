@@ -13,9 +13,15 @@ from ltuser.models import Ltuser
 from activity.models import Activity, Team
 
 # User
-user1 = User.objects.create_user("user1","user1@linktime.cc","123456")
-user2 = User.objects.create_user("user2","user2@linktime.cc","123456")
-user3 = User.objects.create_user("user3","user3@linktime.cc","123456")
+user1 = User.objects.create(username="user1",email="user1@linktime.cc",password="123456")
+user1.set_password("123456")
+user1.save()
+user2 = User.objects.create_user(username="user2",email="user2@linktime.cc",password="123456")
+user2.set_password("123456")
+user2.save()
+user3 = User.objects.create_user(username="user3",email="user3@linktime.cc",password="123456")
+user3.set_password("123456")
+user3.save()
 
 ltuser = Ltuser.objects.create(user=user1)
 ltuser = Ltuser.objects.create(user=user2)
@@ -24,15 +30,15 @@ ltuser = Ltuser.objects.create(user=user3)
 # Activity
 activiy1 = Activity.objects.create(creator=user1,date=TODAY.date(),time=TODAY.time(),
                                    place=u"宝山",price=0,name="我是活动哦",introduction="就是来卖萌的")
-activiy1.orginizer.add(user1)
+activiy1.organizer.add(user1)
 
 activiy2 = Activity.objects.create(creator=user1,date=TODAY.date(),time=TODAY.time(),
                                    place=u"延长",price=0,name="我也是活动哦",introduction="你猜猜看")
-activiy2.orginizer.add(user1)
+activiy2.organizer.add(user1)
 
 activiy3 = Activity.objects.create(creator=user2,date=TODAY.date(),time=TODAY.time(),
                                    place=u"世纪公园",price=1000,name="大家来找茬",introduction="土豪才能玩的游戏")
-activiy3.orginizer.add(user2)
+activiy3.organizer.add(user2)
 
 # Team
 team1 = Team.objects.create(leader=user1,name="学生会",description="小小生活大社会")
