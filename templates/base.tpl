@@ -5,17 +5,12 @@
     {% block description %}<meta name="description" content="Linktime">{% endblock %}
     {% block keywords %}<meta name="keywords" content="Linktime">{% endblock %}
     <meta name="author" content="yang fan">
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap.min.css" />
-    <!--<link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap-responsive.min.css" />-->
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap-theme.min.css" />
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/linktimestyle.css" />
-    <!-- <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap-datetimepicker.min.css" /> -->
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/datepicker3.css" />
+    {% include 'css.tpl' %}
     <style type="text/css">
       html,
       body {
         height: 100%;
-        background:url('{{ STATIC_URL }}/image/ricepaper_v3.png')
+        background:url('{{ STATIC_URL }}image/ricepaper_v3.png')
         /* The html and body elements cannot have any padding or margin. */
       }
 
@@ -42,7 +37,7 @@
         text-align: center;
         color:rgb(255,255,255);
         /*background-color: #f5f5f5;*/
-        background-image:url('{{ STATIC_URL }}/image/low_contrast_linen.png');
+        background-image:url('{{ STATIC_URL }}image/low_contrast_linen.png');
         position: relative;
       }
 
@@ -117,10 +112,7 @@
 </div>
 
 <div id="footer">
-    <script src="{{ STATIC_URL }}js/jquery-2.0.3.min.js"></script>
-    <script src="{{ STATIC_URL }}js/bootstrap.min.js"></script>
-    <script src="{{ STATIC_URL }}js/bootstrap-datepicker.js"></script>
-    <script src="{{ STATIC_URL }}js/locales/bootstrap-datepicker.zh-CN.js"></script>
+    {% include 'js.tpl' %}
     {% block js_footer %}
     {% endblock %}
 <br>

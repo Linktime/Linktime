@@ -5,7 +5,7 @@
         <div class="friend-item">
             <div class="friend-name"><a href="{% url user_space pk=single_user.ltuser.id %}">{{single_user.username}}</a></div>
             <div class="friend-action">
-                <a href="#" class="btn btn-info btn-sm" data-id="{{single_user.id}}" >＋好友</a>
+                <a href="#" onclick="addfriend({{user.id}})" class="btn btn-info btn-sm" data-id="{{single_user.id}}" >＋好友</a>
             </div>
         </div>
 {% endfor %}

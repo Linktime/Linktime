@@ -10,14 +10,19 @@ from django.views.generic import DetailView, ListView
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.list import MultipleObjectMixin
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 
 from ltuser.models import Ltuser, MessageBoard
 from activity.models import Team, Activity
 from ltuser.forms import RegisterForm, LoginForm
+from friend.models import Group
 
 def index(request):
     return render_to_response('index.tpl',context_instance=RequestContext(request))
     #return HttpResponse('Welcome')
+
+def test(request):
+    return render_to_response('test.tpl',context_instance=RequestContext(request))
 
 def register(request):
     if request.method == 'GET':
@@ -58,13 +63,58 @@ class MultipleObjectMixinByMember(MultipleObjectMixin):
         queryset_by_user = queryset.filter(member=self.request.user)
         return queryset_by_user
 
+class MultipleObjectMixinByOwner(MultipleObjectMixin):
+    """
+    用于过滤显示自己的好友圈
+    """
+    def get_queryset(self):
+        queryset = super(MultipleObjectMixinByOwner, self).get_queryset()
+        queryset_by_user = queryset.filter(owner=self.request.user)
+        return queryset_by_user
+
 class MultipleObjectMixinByParticipant(MultipleObjectMixin):
     """
     This mixin filters the queryset in a list-view by request.user
     """
     def get_queryset(self):
         queryset = super(MultipleObjectMixinByParticipant, self).get_queryset()
-        queryset_by_user = queryset.filter(participant=self.request.user)
+        queryset_by_user = queryset.filter(participant__single=self.request.user,participant__team_flag=False)
+        return queryset_by_user
+
+class MultipleObjectMixinByOrganizer(MultipleObjectMixin):
+    """
+    This mixin filters the queryset in a list-view by request.user
+    """
+    def get_queryset(self):
+        queryset = super(MultipleObjectMixinByOrganizer, self).get_queryset()
+        queryset_by_user = queryset.filter(organizer__single=self.request.user,organizer__team_flag=False)
+        return queryset_by_user
+
+class MultipleObjectMixinByCreator(MultipleObjectMixin):
+    """
+    This mixin filters the queryset in a list-view by request.user
+    """
+    def get_queryset(self):
+        queryset = super(MultipleObjectMixinByCreator, self).get_queryset()
+        queryset_by_user = queryset.filter(creator=self.request.user)
+        return queryset_by_user
+
+class MultipleObjectMixinByMarker(MultipleObjectMixin):
+    """
+    This mixin filters the queryset in a list-view by request.user
+    """
+    def get_queryset(self):
+        queryset = super(MultipleObjectMixinByMarker, self).get_queryset()
+        queryset_by_user = queryset.filter(marker=self.request.user)
+        return queryset_by_user
+
+class MultipleObjectMixinBySponsor(MultipleObjectMixin):
+    """
+    This mixin filters the queryset in a list-view by request.user
+    """
+    def get_queryset(self):
+        queryset = super(MultipleObjectMixinBySponsor, self).get_queryset()
+        queryset_by_user = queryset.filter(sponsor__single=self.request.user,sponsor__team_flag=False)
         return queryset_by_user
 
 class UserSpace(DetailView):
@@ -79,6 +129,15 @@ class UserInfo(SingleObjectMixinByUser,DetailView):
     template_name = 'ltuser/user_info.tpl'
     context_object_name = 'ltuser'
 
+class UserTrends(MultipleObjectMixinByOwner,ListView):
+    # FIXME
+    model = Group
+    template_name = 'ltuser/user_trends.tpl'
+    context_object_name = 'groups'
+    # def get_context_data(self, **kwargs):
+    #     context = super(UserTrends, self).get_context_data(**kwargs)
+    #     return context
+
 class UserTeam(MultipleObjectMixinByMember,ListView):
     model = Team
     template_name = 'ltuser/user_team.tpl'
@@ -88,6 +147,37 @@ class UserActivity(MultipleObjectMixinByParticipant,ListView):
     model = Activity
     template_name = 'ltuser/user_activity.tpl'
     context_object_name = 'activitys'
+    paginate_by = 20
+
+class UserParticipantActivity(MultipleObjectMixinByParticipant,ListView):
+    model = Activity
+    template_name = 'ltuser/user_participant_activity.tpl'
+    context_object_name = 'activitys'
+    paginate_by = 20
+
+class UserOrganizerActivity(MultipleObjectMixinByOrganizer,ListView):
+    model = Activity
+    template_name = 'ltuser/user_organizer_activity.tpl'
+    context_object_name = 'activitys'
+    paginate_by = 20
+
+class UserCreatorActivity(MultipleObjectMixinByCreator,ListView):
+    model = Activity
+    template_name = 'ltuser/user_creator_activity.tpl'
+    context_object_name = 'activitys'
+    paginate_by = 20
+
+class UserMarkerActivity(MultipleObjectMixinByMarker,ListView):
+    model = Activity
+    template_name = 'ltuser/user_marker_activity.tpl'
+    context_object_name = 'activitys'
+    paginate_by = 20
+
+class UserSponsorActivity(MultipleObjectMixinBySponsor,ListView):
+    model = Activity
+    template_name = 'ltuser/user_sponsor_activity.tpl'
+    context_object_name = 'activitys'
+    paginate_by = 20
 
 class UserMessageBoard(ListView):
     model = MessageBoard

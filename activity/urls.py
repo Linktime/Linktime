@@ -1,5 +1,6 @@
 from django.conf.urls import patterns, include, url
-from activity.views import ActivityListView, ActivityDetailView, ActivityManageDetailView
+from django.contrib.auth.decorators import login_required
+from activity.views import ActivityListView, ActivityDetailView, ActivityManageDetailView, ActivityParticipantDetailView
 from activity.views import activity_create, activity_join, activity_join_cancel, activity_mark, activity_mark_cancel
 from activity.models import Activity
 
@@ -11,5 +12,6 @@ urlpatterns = patterns('',
     url(r'^(?P<pk>\d*)/cancel_join/$',activity_join_cancel,name="activity_join_cancel"),
     url(r'^(?P<pk>\d*)/mark/$',activity_mark,name="activity_mark"),
     url(r'^(?P<pk>\d*)/cancel_mark/$',activity_mark_cancel,name="activity_mark_cancel"),
-    url(r'^(?P<pk>\d*)/manage/$',ActivityManageDetailView.as_view(),name="activity_manage"),
+    url(r'^(?P<pk>\d*)/manage/$',login_required(ActivityManageDetailView.as_view()),name="activity_manage"),
+    url(r'^(?P<pk>\d*)/manage/participant$',login_required(ActivityParticipantDetailView.as_view()),name="activity_manage_participant"),
 )

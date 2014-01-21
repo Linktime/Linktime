@@ -10,7 +10,7 @@ if __name__ == "__main__":
 
 from django.contrib.auth.models import User
 from ltuser.models import Ltuser
-from activity.models import Activity, Team
+from activity.models import Activity, Team, GenericMember
 
 # User
 user1 = User.objects.create(username="user1",email="user1@linktime.cc",password="123456")
@@ -30,15 +30,18 @@ ltuser = Ltuser.objects.create(user=user3)
 # Activity
 activiy1 = Activity.objects.create(creator=user1,date=TODAY.date(),time=TODAY.time(),
                                    place=u"宝山",price=0,name="我是活动哦",introduction="就是来卖萌的")
-activiy1.organizer.add(user1)
+generic_object = GenericMember.objects.create(single=user1)
+activiy1.organizer.add(generic_object)
 
 activiy2 = Activity.objects.create(creator=user1,date=TODAY.date(),time=TODAY.time(),
                                    place=u"延长",price=0,name="我也是活动哦",introduction="你猜猜看")
-activiy2.organizer.add(user1)
+generic_object = GenericMember.objects.create(single=user1)
+activiy2.organizer.add(generic_object)
 
 activiy3 = Activity.objects.create(creator=user2,date=TODAY.date(),time=TODAY.time(),
                                    place=u"世纪公园",price=1000,name="大家来找茬",introduction="土豪才能玩的游戏")
-activiy3.organizer.add(user2)
+generic_object = GenericMember.objects.create(single=user2)
+activiy3.organizer.add(generic_object)
 
 # Team
 team1 = Team.objects.create(leader=user1,name="学生会",description="小小生活大社会")

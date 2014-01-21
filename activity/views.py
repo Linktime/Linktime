@@ -12,7 +12,7 @@ from django.shortcuts import render_to_response, Http404
 from django.contrib.admin.models import User
 import json
 
-from activity.models import Activity
+from activity.models import Activity, GenericMember
 from activity.forms import ActivityCreateForm
 
 class SingleObjectMixinByOrganizer(SingleObjectMixin):
@@ -21,7 +21,8 @@ class SingleObjectMixinByOrganizer(SingleObjectMixin):
     """
     def get_object(self):
         object = super(SingleObjectMixinByOrganizer, self).get_object()
-        if self.request.user in object.organizer.all():
+        organizer = object.organizer.filter(single=self.request.user,team_flag=False)
+        if organizer:
             return object
         else:
             raise Http404
@@ -32,7 +33,7 @@ class MultipleObjectMixinByParticipant(MultipleObjectMixin):
     """
     def get_queryset(self):
         queryset = super(MultipleObjectMixinByParticipant, self).get_queryset()
-        queryset_by_user = queryset.filter(participant=self.request.user)
+        queryset_by_user = queryset.filter(participant__single=self.request.user,team_flag=False)
         return queryset_by_user
 
 class ActivityListView(ListView):
@@ -48,8 +49,9 @@ class ActivityDetailView(DetailView):
     context_object_name = 'activity'
 
     def get_context_data(self, **kwargs):
-        context = super(ActivityDetailView,self).get_context_data()
-        if self.request.user in context['activity'].organizer.all():
+        context = super(ActivityDetailView,self).get_context_data(**kwargs)
+        organizer = context['activity'].organizer.filter(single=self.request.user,team_flag=False)
+        if organizer:
             context['organizer'] = True
         return context
 
@@ -57,6 +59,16 @@ class ActivityManageDetailView(DetailView,SingleObjectMixinByOrganizer):
     model = Activity
     template_name = 'activity/activity_manage_detailview.tpl'
     context_object_name = 'activity'
+
+class ActivityParticipantDetailView(DetailView,SingleObjectMixinByOrganizer):
+    model = Activity
+    template_name = 'activity/activity_participant.tpl'
+    context_object_name = 'activity'
+
+    def get_context_data(self, **kwargs):
+        context = super(ActivityParticipantDetailView,self).get_context_data(**kwargs)
+        context['participants'] = context['activity'].participant.filter()
+        return context
 
 class ActivityMapView(DetailView):
     model = Activity
@@ -79,7 +91,8 @@ def activity_create(request):
             activity = form.save(commit=False)
             activity.creator = request.user
             activity.save()
-            activity.organizer.add(request.user)
+            generic_object = GenericMember.objects.create(single=request.user)
+            activity.organizer.add(generic_object)
             messages.success(request, u'活动已创建成功！')
             return HttpResponseRedirect(reverse('activity_detail', kwargs={'pk': activity.id}))
         else:
@@ -92,10 +105,12 @@ def activity_join(request, pk):
     try:
         user = request.user
         activity = Activity.objects.get(id=pk)
-        if user in activity.participant.all():
+        user_object = activity.participant.filter(single=request.user,team_flag=False)
+        if user_object:
             messages.info(request, u'你已报名成功，无须重复报名')
         else:
-            activity.participant.add(user)
+            user_object = GenericMember.objects.create(single=request.user)
+            activity.participant.add(user_object)
             messages.success(request, u'你已报名成功！')
     except Activity.DoesNotExist:
         messages.error(request, u'您要参加的活动不存在，请重新确认！')
@@ -107,8 +122,13 @@ def activity_join_cancel(request, pk):
     try:
         user = request.user
         activity = Activity.objects.get(id=pk)
-        activity.participant.remove(user)
-        messages.info(request, u'你已取消报名！')
+        try :
+            user_object = activity.participant.get(single=request.user.id,team_flag=False)
+            activity.participant.remove(user_object)
+            messages.info(request, u'你已取消报名！')
+        except:
+            messages.warning(request, u'你未报名该活动！')
+
     except Activity.DoesNotExist:
         messages.error(request, u'您要取消参加的活动不存在，请重新确认！')
     return HttpResponseRedirect(reverse('activity_detail', kwargs={'pk': pk}))
@@ -136,6 +156,8 @@ def activity_mark_cancel(request,pk):
     return HttpResponseRedirect(reverse('activity_detail', kwargs={'pk': pk}))
 
 
+# FIXME
+# ------------------------------------------
 @login_required()
 def activity_support(request, pk):
     try:
@@ -161,7 +183,7 @@ def activity_support_cancel(request, pk):
     except Activity.DoesNotExist:
         messages.error(request, u'您要取消赞助的活动不存在，请重新确认！')
     return HttpResponseRedirect(reverse('activity_detail', kwargs={'pk': pk}))
-
+# -------------------------------------------------------------
 
 # FIXME
 # This function should server for ajax

@@ -9,24 +9,36 @@ from django.contrib.contenttypes import generic
 
 class Team(models.Model):
     #某某神秘组织
-    name = models.CharField(max_length=30)
+    name = models.CharField(max_length=30,unique=True)
     description = models.TextField()
     date = models.DateField(auto_now_add=True) #用以记录小组创办时间
     leader = models.ForeignKey(User,related_name="team_leader")
     member = models.ManyToManyField(User,related_name="team_member")
+    activity_team = models.BooleanField(default=False)
+
+    def set_logo(self):
+        pass
+
+    def get_logo(self):
+        pass
+
     def __unicode__(self):
         return self.name
 
-class UserOrTeam(models.Model):
-    user = models.ForeignKey(User,null=True)
-    team = models.ForeignKey(Team,null=True)
-    user_or_team = models.BooleanField(default=False)
+class GenericMember(models.Model):
+    # content_type = models.ForeignKey(ContentType)
+    # object_id = models.PositiveIntegerField()
+    # content_object = generic.GenericForeignKey('content_type', 'object_id')
+    single = models.ForeignKey(User,related_name="genericmember_single",null=True)
+    team = models.ForeignKey(Team,related_name="genericmember_group",null=True)
+    team_flag = models.BooleanField(default=False)
+    datetime = models.DateTimeField(auto_now=True)
 
-    def get(self):
-        if self.user_or_team==False:
-            return self.user
+    def get_name(self):
+        if self.team_flag :
+            return self.team.name
         else :
-            return self.team
+            return self.single.username
 
 class Activity(models.Model):
     #活动模型
@@ -42,10 +54,10 @@ class Activity(models.Model):
     preparing = models.BooleanField(default=True)
     #FIXME The follow field should allow add as a group
     creator = models.ForeignKey(User,related_name='activity_creator')
-    organizer = models.ManyToManyField(User,related_name="activity_organizer")
+    organizer = models.ManyToManyField(GenericMember,related_name="activity_organizer")
     marker = models.ManyToManyField(User,related_name="activity_marker",blank=True)
-    sponsor = models.ManyToManyField(User,related_name="activity_sponsor",blank=True)
-    participant = models.ManyToManyField(User,related_name="activity_participant",blank=True)
+    sponsor = models.ManyToManyField(GenericMember,related_name="activity_sponsor",blank=True)
+    participant = models.ManyToManyField(GenericMember,related_name="activity_participant",blank=True)
 
     def __unicode__(self):
         return u"%s" % self.name

@@ -3,6 +3,8 @@ from django.contrib.auth.views import login
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
+
+
 admin.autodiscover()
 
 urlpatterns = patterns('',
@@ -14,6 +16,8 @@ urlpatterns = patterns('',
     url(r'^user/',include('ltuser.urls')),
     url(r'^activity/',include('activity.urls')),
     url(r'^friend/',include('friend.urls')),
+
+    url(r'^test/','ltuser.views.test'),
     # Examples:
     # url(r'^$', 'Linktime.views.home', name='home'),
     # url(r'^Linktime/', include('Linktime.foo.urls')),

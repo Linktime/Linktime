@@ -55,6 +55,11 @@ def ajax_search_friend(request):
         count = 0
     return render_to_response("friend/ajax_friend_list.tpl",{"users":users,"count":count},context_instance=RequestContext(request))
 
+def ajax_group_list(request):
+    groups = Group.objects.filter(owner=request.user)
+    count = len(groups)
+    return render_to_response("friend/ajax_group_list.tpl",{"groups":groups,"count":count},context_instance=RequestContext(request))
+
 @login_required
 def friend_add_pre(request):
     user_id = request.POST.get("user_id")

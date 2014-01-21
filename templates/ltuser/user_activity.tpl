@@ -1,45 +1,54 @@
 {% extends 'ltuser/user_base.tpl' %}
 {% block content %}
-{% if not activitys %}
-            <div class="alert alert-warning">你还没有参加任何活动哦，<a href="{% url activity_list %}">点击此</a>寻找适合你的活动报名吧</div>
-{% endif %}
-      <div class="activity-list">
-      {% for activity in activitys %}
-        <div class="activity-item" >
-        <div class="activity-title" >活动名称:<a href="{% url activity_detail pk=activity.id %}" title="详情" >{{activity.name}}</a>
-            <div class="activity-action">
-                <a class="btn btn-info btn-xs" href="{% url activity_join pk=activity.id %}">参加</a>
-                <a class="btn btn-primary btn-xs" href="{% url activity_mark pk=activity.id %}">收藏</a>
-                <a class="btn btn-warning btn-xs">赞助</a>
-            </div>
-        </div>
-        <div class="activity-content">简介:{{activity.introduction}}
-        </div>
 
-        <div class="activity-bottom">
-            <div class="activity-price">价格:{% if activity.price = 0 %}<span class="label label-success">Free</span>{% else %}{{activity.price}}{% endif %}</div>
-            <div class="activity-time" >时间:{{activity.date|date:"Y年m月d日"}}</div>
-        </div>
-    </div>
-      {% endfor %}
-      </div>
+<!-- Nav tabs -->
+<ul class="nav nav-tabs">
+  <li class="active"><a href="#join" data-toggle="tab" onclick="join();">我参加的</a></li>
+  <li><a href="#organize" data-toggle="tab" onclick="organize();">我组织的</a></li>
+  <li><a href="#create" data-toggle="tab" onclick="create();">我创建的</a></li>
+  <li><a href="#support" data-toggle="tab" onclick="support();">我赞助的</a></li>
+    <li><a href="#mark" data-toggle="tab" onclick="mark();" >我收藏的</a></li>
+</ul>
 
-    {% if is_paginated %}
-    <div>
-        <ul class="pagination pagination-centered">
-            {% if page_obj.has_previous %}
-            <li><a href="?page={{ page_obj.previous_page_number }}">«</a></li>
-            {% endif %}
-            {% for page in page_obj.paginator.page_range %}
-            <li><a href="?page={{page}}">{{page}}</a></li>
-            {% endfor %}
-            {% if page_obj.has_next %}
-            <li><a href="?page={{ page_obj.next_page_number }}">»</a></li>
-            {% endif %}
-            <li><a>第{{ page_obj.number }} 页/ 共{{ page_obj.paginator.num_pages }}页</a></li>
-        </ul>
-    </div><!-- paginate -->
-    {% endif %}
+<!-- Tab panes -->
+<div class="tab-content">
+  <div class="tab-pane active" id="join">
+      {% include 'ltuser/user_participant_activity.tpl' %}
+  </div>
+  <div class="tab-pane" id="organize"></div>
+  <div class="tab-pane" id="create"></div>
+  <div class="tab-pane" id="support"></div>
+  <div class="tab-pane" id="mark"></div>
+</div>
 
+{% endblock %}
 
+{% block js_footer %}
+        <script type="text/javascript">
+            function join(page=1){
+                $.get("{% url user_activity_participant pk=user.ltuser.id %}" + "?page=" + page,function(data){
+                    $("#join").html(data);
+                });
+            };
+            function organize(page=1){
+                $.get("{% url user_activity_organizer pk=user.ltuser.id %}" + "?page=" + page,function(data){
+                    $("#organize").html(data);
+                });
+            };
+            function create(page=1){
+                $.get("{% url user_activity_creator pk=user.ltuser.id %}" + "?page=" + page,function(data){
+                    $("#create").html(data);
+                });
+            };
+            function support(page=1){
+                $.get("{% url user_activity_sponsor pk=user.ltuser.id %}" + "?page=" + page,function(data){
+                    $("#support").html(data);
+                });
+            };
+            function mark(page=1){
+                $.get("{% url user_activity_marker pk=user.ltuser.id %}" + "?page=" + page,function(data){
+                    $("#mark").html(data);
+                });
+            };
+        </script>
 {% endblock %}

@@ -1,7 +1,7 @@
 {% extends "friend/friend_base.tpl" %}
 {% block content %}
         <div>
-            <form >
+            <form id="search_form" >
                 <div class="input-group">
                     {% csrf_token %}
                   <input type="text" placeholder="在此输入要搜索的好友名字" class="form-control" name="username">
@@ -28,11 +28,11 @@
         <h4 class="modal-title" id="myModalLabel">请选择一个好友分组</h4>
       </div>
       <div class="modal-body">
-        ...
+        <div id="group_list"></div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal">返回</button>
-        <button type="button" class="btn btn-primary">确认</button>
+        <button type="button" class="btn btn-primary" id="confirm_btn">确认</button>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
@@ -42,18 +42,25 @@
 {% block js_footer %}
     <script type="text/javascript">
     $("#search_btn").click(function(){
-        var $form = $("form")
+        var $form = $("#search_form");
         $.post("{% url ajax_friend_search %}",$form.serialize(),function(data){
             $("#friend_list").html(data);
         });
     });
 
-    // FIXME
-    $(function(){
-    $(".friend-action a").click(function(){
-        var id = $(this).data("id");
+    function addfriend(userid){
         $("#select_group").modal("show");
+        $.get("{% url ajax_group_list %}",function(data){
+            $("#group_list").html(data);
+            $("#user_id").attr("value",userid);
         });
+
+    };
+
+    $("#confirm_btn").click(function(){
+        var $form = $("#group_form");
+        $form.submit();
     });
+
     </script>
 {% endblock %}
