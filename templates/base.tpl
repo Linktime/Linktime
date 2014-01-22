@@ -6,6 +6,8 @@
     {% block keywords %}<meta name="keywords" content="Linktime">{% endblock %}
     <meta name="author" content="yang fan">
     {% include 'css.tpl' %}
+    {% block css_head %}
+    {% endblock %}
     <style type="text/css">
       html,
       body {

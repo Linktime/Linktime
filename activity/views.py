@@ -10,9 +10,12 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponseForbidde
 from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, Http404
 from django.contrib.admin.models import User
-import json
+from django.views.decorators.csrf import csrf_exempt
 
-from activity.models import Activity, GenericMember
+import json
+import datetime
+
+from activity.models import Activity, GenericMember, GenericOrganizer
 from activity.forms import ActivityCreateForm
 
 class SingleObjectMixinByOrganizer(SingleObjectMixin):
@@ -91,7 +94,7 @@ def activity_create(request):
             activity = form.save(commit=False)
             activity.creator = request.user
             activity.save()
-            generic_object = GenericMember.objects.create(single=request.user)
+            generic_object = GenericOrganizer.objects.create(single=request.user)
             activity.organizer.add(generic_object)
             messages.success(request, u'活动已创建成功！')
             return HttpResponseRedirect(reverse('activity_detail', kwargs={'pk': activity.id}))
@@ -109,7 +112,7 @@ def activity_join(request, pk):
         if user_object:
             messages.info(request, u'你已报名成功，无须重复报名')
         else:
-            user_object = GenericMember.objects.create(single=request.user)
+            user_object = GenericOrganizer.objects.create(single=request.user)
             activity.participant.add(user_object)
             messages.success(request, u'你已报名成功！')
     except Activity.DoesNotExist:
@@ -209,3 +212,18 @@ def activity_organizer_cancel(request, pk):
 
 # -------------------------------------------------------------------------------------
 
+@csrf_exempt
+def ajax_activity_update(request,pk):
+    # import code;code.interact(local=locals())
+    try:
+        activity = Activity.objects.get(id=pk)
+        if request.POST['name'] == u'date':
+            activity.__dict__[request.POST['name']] = datetime.datetime.strptime(request.POST['value'],"%Y-%m-%d").date()
+            activity.save()
+        else :
+            activity.__dict__[request.POST['name']] = request.POST['value']
+            activity.save()
+        return HttpResponse()
+    except :
+        messages.error(request,u"更新失败，如多次出现该提示，请联系管理员")
+        return HttpResponseRedirect(reverse('activity_detail',kwargs={'pk':pk}))

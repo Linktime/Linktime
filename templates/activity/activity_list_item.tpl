@@ -15,7 +15,7 @@
     </div>
 
     <div class="activity-bottom">
-        <div class="activity-price">价格:{% if activity.price = 0 %}<span class="label label-success">Free</span>{% else %}{{activity.price}}{% endif %}</div>
+        <div class="activity-price">价格:{% if activity.price = 0 %}<span class="label label-success">Free</span>{% else %}{{activity.price}}元{% endif %}</div>
         <div class="activity-time" >时间:{{activity.date|date:"Y年m月d日"}}</div>
     </div>
 
