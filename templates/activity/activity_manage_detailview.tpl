@@ -18,11 +18,13 @@
                 <div class="activity-extra">
                     <div class="activity-price">
                         价格:<a href="#" id="activity_price" data-type="text" data-pk="{{activity.id}}" data-title="修改价格">{% if activity.price = 0 %}<span class="label label-success">Free</span>{% else %}{{activity.price}}{% endif %}</a></div>
-                    <div class="activity-time" >时间:<a href="#" id="activity_date" data-pk="{{activity.id}}" data-title="修改时间">{{activity.date|date:"Y-m-d"}}</a></div>
+                    <div class="activity-date" >日期:<a href="#" id="activity_date" data-pk="{{activity.id}}" data-title="修改时间">{{activity.date|date:"Y-m-d"}}</a></div>
                 </div>
                 <div class="activity-image-box">在此处添加图片（未开放）</div>
                 <div class="activity-content">
-                    简介:</br><div class="hide" id="introduction_toolbar">{% include 'activity/activity_wysiwyg_toolbar.tpl' %}</div>
+                    简介:</br>
+                    <div class="activity-abstract">{{activity.abstract}}</div>
+                    <div class="hide" id="introduction_toolbar">{% include 'activity/activity_wysiwyg_toolbar.tpl' %}</div>
                     <div id="activity_introduction" data-pk="{{activity.id}}">{{activity.introduction|safe}}</div>
                     <form id="introduction_form">
                     <input name="name" class="hide" value="introduction">
@@ -36,7 +38,7 @@
                     </div>
                 </div>
                 <div class="activity-video-box">在此处添加视频（未开放）</div>
-                <div class="activity-place">地点:<a href="#" id="activity_place" data-pk="{{activity.id}}" data-title="修改地点">{{activity.place}}</a></div>
+                <div class="activity-place">地点:<a href="#" id="activity_address" data-pk="{{activity.id}}" data-title="修改地点">{{activity.address}}</a></div>
                 <div class="activity-map" >Map</div>
             </div>
         </div>
@@ -59,8 +61,8 @@
             url:update_url,
         });
 
-        $("#activity_place").editable({
-            name:'place',
+        $("#activity_address").editable({
+            name:'address',
             mode:'inline',
             type:'text',
             url:update_url,

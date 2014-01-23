@@ -4,6 +4,8 @@ from django.contrib.auth.models import User
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 
+from place.models import GenericPlace, Lbs
+
 # Create your models here.
 #以下为与活动相关的数据模型
 
@@ -60,19 +62,17 @@ class GenericOrganizer(models.Model):
 class Activity(models.Model):
     #活动模型
     name = models.CharField(max_length=30)
-    introduction = models.TextField()
+    abstract = models.CharField(max_length=200)
+    introduction = models.TextField(default=u"暂无详情介绍")
     date = models.DateField() #活动举办时间，应为DateTime类型，待改
     time = models.TimeField(null=True,blank=True)
     create_date = models.DateTimeField(auto_now_add=True)
-    place = models.CharField(max_length=30)
-    price = models.IntegerField()
-    # category = models.CharField(max_length=30,null=True,blank=True)
-    tag = models.ForeignKey('ActivityTag',null=True,blank=True)
+    place = models.ForeignKey(GenericPlace,related_name='activity_palce',blank=True,null=True)
+    address = models.CharField(max_length=30)
     preparing = models.BooleanField(default=True)
-    #FIXME The follow field should allow add as a group
+    lbs = models.OneToOneField(Lbs,null=True,blank=True)
     creator = models.ForeignKey(User,related_name='activity_creator')
     organizer = models.ManyToManyField(GenericOrganizer,related_name="activity_organizer")
-    marker = models.ManyToManyField(User,related_name="activity_marker",blank=True)
     sponsor = models.ManyToManyField(GenericOrganizer,related_name="activity_sponsor",blank=True)
     participant = models.ManyToManyField(GenericMember,related_name="activity_participant",blank=True)
 
@@ -89,15 +89,42 @@ class Comment(models.Model):
     def __unicode__(self):
         return u'%s:%s,Time:%s' % (self.owner.alias,self.text,self.date)
 
+class ActivityPriceType(models.Model):
+    # 票的种类
+    activity = models.ForeignKey(Activity)
+    type = models.CharField(max_length=20)
+    count = models.IntegerField()
+    price = models.IntegerField()
+
+    def __unicode__(self):
+        return u'%s:type:%s--price:%s--count:%s' % (self.activity.name,self.type,self.price,self.count)
+
+class ActivityTicket(models.Model):
+    # 票
+    owner = models.ForeignKey(GenericMember,related_name='activityticket_owner')
+    type = models.ForeignKey(ActivityPriceType,related_name='activityticket_type')
+
+    def __unicode__(self):
+        return u'%s:%s--%s' % (self.owner.username,self.type.type,self.type.activity.name)
+
+class ActivityOptions(models.Model):
+    activity = models.OneToOneField(Activity,related_name='activityoptions_activity')
+    team_flag = models.NullBooleanField(null=True)
+    team_max = models.IntegerField()
+    during = models.CharField(max_length=20)
+
+    def __unicode__(self):
+        return u'%s' % (self.activity.name)
 
 class ActivityTag(models.Model):
+    activity = models.ForeignKey(Activity,related_name="activitytag_activity")
     category = models.CharField(max_length=30,null=True,blank=True)
 
 class ActivityIntroduction(models.Model):
     activity = models.ForeignKey(Activity)
-    content_type = models.ForeignKey(ContentType)
-    object_id = models.PositiveIntegerField()
-    content_object = generic.GenericForeignKey('content_type', 'object_id')
+    # content_type = models.ForeignKey(ContentType)
+    # object_id = models.PositiveIntegerField()
+    # content_object = generic.GenericForeignKey('content_type', 'object_id')
     type = models.CharField(max_length=30)
 
 class VideoIntroduction(ActivityIntroduction):

@@ -3,9 +3,7 @@
 {% block css_head %}
         <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap-editable.css" />
         <style type="text/css">
-            .introduction {
-                overflow-y:scroll;word-break:normal; min-height:300px;
-            }
+            #
         </style>
 {% endblock %}
 
@@ -25,22 +23,26 @@
                 </div>
                 <div class="activity-extra">
                     <div class="activity-price">价格:<a href="#" id="price"></a>{{form.price}}元</div>
-                    <div class="activity-time" >时间:<a href="#" id="date"></a>{{form.date}}</div>
+                    <div class="activity-date" >日期:<a href="#" id="date"></a>{{form.date}}</div>
                 </div>
                 <div class="activity-image-box">在此处添加图片（未开放）</div>
                 <div class="activity-content">
-                    简介:
+                    <p>简介：</p>
+                    <div class="activity-abstract">
+                        {{form.abstract}}
+                    </div>
+                    <p>详情：</p>
                     {% include 'activity/activity_wysiwyg_toolbar.tpl' %}
-                    <div class="form-control introduction" id="introduction"></div>
+                    <div class="form-control activity-introduction" id="introduction"></div>
                     {{ form.introduction }}
                 </div>
                 <div class="activity-video-box">在此处添加视频（未开放）</div>
-                <div class="activity-place">地点:<a href="#" id="place"></a>{{form.place}}</div>
+                <div class="activity-place">地点:<a href="#" id="address"></a>{{form.address}}</div>
                 <div class="activity-map" >Map</div>
             </div>
         </div>
     </form>
-    <input id="submit" type="submit" class="btn btn-primary pull-right" value="提交">
+    <input id="submit" type="submit" class="btn btn-primary pull-right" value="筹备">
 {% endblock %}
 
 {% block js_footer %}
@@ -54,7 +56,7 @@
         type:'text',
     });
 
-    $("#place").editable({
+    $("#address").editable({
         mode:'inline',
         emptytext:'在此输入活动地点',
         type:'text',
@@ -91,8 +93,8 @@
         $("#id_date").attr("value",$date.html());
         var $price = $("#price");
         $("#id_price").attr("value",$price.html());
-        var $place = $("#place");
-        $("#id_place").attr("value",$place.html());
+        var $address = $("#address");
+        $("#id_address").attr("value",$address.html());
         $form.submit();
     });
 

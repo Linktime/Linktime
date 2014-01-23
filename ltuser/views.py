@@ -99,13 +99,13 @@ class MultipleObjectMixinByCreator(MultipleObjectMixin):
         queryset_by_user = queryset.filter(creator=self.request.user)
         return queryset_by_user
 
-class MultipleObjectMixinByMarker(MultipleObjectMixin):
+class MultipleObjectMixinByMarkActivity(MultipleObjectMixin):
     """
     This mixin filters the queryset in a list-view by request.user
     """
     def get_queryset(self):
-        queryset = super(MultipleObjectMixinByMarker, self).get_queryset()
-        queryset_by_user = queryset.filter(marker=self.request.user)
+        # queryset = super(MultipleObjectMixinByMarkActivity, self).get_queryset()
+        queryset_by_user = self.request.user.ltuser.mark_activity.filter()
         return queryset_by_user
 
 class MultipleObjectMixinBySponsor(MultipleObjectMixin):
@@ -167,7 +167,7 @@ class UserCreatorActivity(MultipleObjectMixinByCreator,ListView):
     context_object_name = 'activitys'
     paginate_by = 20
 
-class UserMarkerActivity(MultipleObjectMixinByMarker,ListView):
+class UserMarkerActivity(MultipleObjectMixinByMarkActivity,ListView):
     model = Activity
     template_name = 'ltuser/user_marker_activity.tpl'
     context_object_name = 'activitys'

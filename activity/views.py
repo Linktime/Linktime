@@ -31,6 +31,18 @@ class SingleObjectMixinByOrganizer(SingleObjectMixin):
         else:
             raise Http404
 
+class SingleObjectMixinByOrganizerAndPreparing(SingleObjectMixin):
+    """
+    This mixin checks object ownership in detail-view or delete-view
+    """
+    def get_object(self):
+        object = super(SingleObjectMixinByOrganizerAndPreparing, self).get_object()
+        organizer = object.organizer.filter(single=self.request.user,team_flag=False)
+        if organizer or not object.preparing:
+            return object
+        else:
+            raise Http404
+
 class MultipleObjectMixinByParticipant(MultipleObjectMixin):
     """
     This mixin filters the queryset in a list-view by request.user
@@ -47,7 +59,7 @@ class ActivityListView(ListView):
     paginate_by = 20
 
 
-class ActivityDetailView(DetailView):
+class ActivityDetailView(SingleObjectMixinByOrganizerAndPreparing,DetailView):
     model = Activity
     template_name = 'activity/activity_detailview.tpl'
     context_object_name = 'activity'
@@ -100,7 +112,7 @@ def activity_create(request):
             generic_object = GenericOrganizer.objects.create(single=request.user)
             activity.organizer.add(generic_object)
             messages.success(request, u'活动已创建成功！')
-            return HttpResponseRedirect(reverse('activity_detail', kwargs={'pk': activity.id}))
+            return HttpResponseRedirect(reverse('activity_manage', kwargs={'pk': activity.id}))
         else:
             messages.warning(request, u'请重新确认您输入的信息是否有误！%s'%form.errors)
     return render_to_response('activity/activity_create.tpl', {'form': form}, context_instance=RequestContext(request))
@@ -144,7 +156,7 @@ def activity_mark(request,pk):
     try:
         user = request.user
         activity = Activity.objects.get(id=pk)
-        activity.marker.add(user)
+        user.ltuser.mark_activity.add(activity)
         messages.info(request, u'你已成功收藏！')
     except Activity.DoesNotExist:
         messages.success(request, u'您要收藏的活动不存在，请重新确认！')
@@ -155,7 +167,7 @@ def activity_mark_cancel(request,pk):
     try:
         user = request.user
         activity = Activity.objects.get(id=pk)
-        activity.marker.remove(user)
+        user.ltuser.mark_activity.remove(activity)
         messages.info(request, u'你已取消收藏！')
     except Activity.DoesNotExist:
         messages.error(request, u'您要取消收藏的活动不存在，请重新确认！')
