@@ -62,7 +62,7 @@ class Activity(models.Model):
     name = models.CharField(max_length=30)
     introduction = models.TextField()
     date = models.DateField() #活动举办时间，应为DateTime类型，待改
-    time = models.TimeField()
+    time = models.TimeField(null=True,blank=True)
     create_date = models.DateTimeField(auto_now_add=True)
     place = models.CharField(max_length=30)
     price = models.IntegerField()

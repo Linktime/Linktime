@@ -18,11 +18,12 @@
                     <div class="activity-price">价格:{% if activity.price = 0 %}<span class="label label-success">Free</span>{% else %}{{activity.price}}元{% endif %}</div>
                     <div class="activity-time" >时间:{{activity.date|date:"Y年m月d日"}}</div>
                 </div>
-                <div class="activity-image-box">Images are Missing</div>
+                <div class="activity-image-box">在此处添加图片（未开放）</div>
                 <div class="activity-content">
-                    简介:{{activity.introduction}}
+                    简介:</br>{{activity.introduction|safe}}
                 </div>
-                <div class="activity-video-box">Videos are Escape</div>
+                <div class="activity-video-box">在此处添加视频（未开放）</div>
+                <div class="activity-place">地点:{{activity.place}}</div>
                 <div class="activity-map" >Map</div>
             </div>
         </div>

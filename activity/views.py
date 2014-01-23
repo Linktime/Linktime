@@ -11,6 +11,7 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import render_to_response, Http404
 from django.contrib.admin.models import User
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib import auth
 
 import json
 import datetime
@@ -53,9 +54,11 @@ class ActivityDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ActivityDetailView,self).get_context_data(**kwargs)
-        organizer = context['activity'].organizer.filter(single=self.request.user,team_flag=False)
-        if organizer:
-            context['organizer'] = True
+        user = auth.get_user(self.request)
+        if not user.is_anonymous():
+            organizer = context['activity'].organizer.filter(single=self.request.user,team_flag=False)
+            if organizer:
+                context['organizer'] = True
         return context
 
 class ActivityManageDetailView(DetailView,SingleObjectMixinByOrganizer):
@@ -99,7 +102,7 @@ def activity_create(request):
             messages.success(request, u'活动已创建成功！')
             return HttpResponseRedirect(reverse('activity_detail', kwargs={'pk': activity.id}))
         else:
-            messages.warning(request, u'请重新确认您输入的信息是否有误！')
+            messages.warning(request, u'请重新确认您输入的信息是否有误！%s'%form.errors)
     return render_to_response('activity/activity_create.tpl', {'form': form}, context_instance=RequestContext(request))
 
 
