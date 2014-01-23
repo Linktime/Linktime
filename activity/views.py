@@ -37,8 +37,14 @@ class SingleObjectMixinByOrganizerAndPreparing(SingleObjectMixin):
     """
     def get_object(self):
         object = super(SingleObjectMixinByOrganizerAndPreparing, self).get_object()
-        organizer = object.organizer.filter(single=self.request.user,team_flag=False)
-        if organizer or not object.preparing:
+        user = self.request.user
+        if not user.is_anonymous:
+            organizer = object.organizer.filter(single=self.request.user,team_flag=False)
+            if organizer:
+                return object
+            else:
+                raise Http404
+        elif not object.preparing:
             return object
         else:
             raise Http404
