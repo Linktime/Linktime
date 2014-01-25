@@ -1,4 +1,6 @@
 {% extends 'base.tpl' %}
+{% block activity_nav %}class="active"{% endblock %}
+
 {% block container %}
     {% block messages %}
         {% if messages %}

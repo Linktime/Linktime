@@ -25,7 +25,8 @@ class SingleObjectMixinByOrganizer(SingleObjectMixin):
     """
     def get_object(self):
         object = super(SingleObjectMixinByOrganizer, self).get_object()
-        organizer = object.organizer.filter(single=self.request.user,team_flag=False)
+        user = auth.get_user(self.request)
+        organizer = object.organizer.filter(single=user,team_flag=False)
         if organizer:
             return object
         else:
@@ -36,10 +37,11 @@ class SingleObjectMixinByOrganizerAndPreparing(SingleObjectMixin):
     This mixin checks object ownership in detail-view or delete-view
     """
     def get_object(self):
+
         object = super(SingleObjectMixinByOrganizerAndPreparing, self).get_object()
-        user = self.request.user
-        if not user.is_anonymous:
-            organizer = object.organizer.filter(single=self.request.user,team_flag=False)
+        user = auth.get_user(self.request)
+        if not user.is_anonymous():
+            organizer = object.organizer.filter(single=user,team_flag=False)
             if organizer:
                 return object
             else:
@@ -128,6 +130,7 @@ def activity_create(request):
     if request.method == 'GET':
         form = ActivityCreateForm()
     else:
+        import code;code.interact(local=locals())
         form = ActivityCreateForm(request.POST)
         if form.is_valid():
             activity = form.save(commit=False)

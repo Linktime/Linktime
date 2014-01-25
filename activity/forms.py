@@ -16,7 +16,7 @@ class ActivityCreateForm(LtModelForm):
     abstract = forms.CharField(widget=forms.Textarea(attrs={"rows":"4"}))
     class Meta:
         model = Activity
-        fields = ("name","introduction","date","place","price")
+        fields = ("name","address","introduction","date","place","price","abstract")
 
     #TODO
     # default creater use login user

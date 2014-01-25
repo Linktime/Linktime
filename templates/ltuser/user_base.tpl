@@ -1,4 +1,7 @@
 {% extends 'base.tpl' %}
+
+{% block user_nav %}class="active"{% endblock %}
+
 {% block container %}
     {% block messages %}
         {% if messages %}

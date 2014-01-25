@@ -1,4 +1,7 @@
 {% extends 'base.tpl' %}
+
+{% block friend_nav %}class="active"{% endblock %}
+
 {% block container %}
     {% block messages %}
         {% if messages %}

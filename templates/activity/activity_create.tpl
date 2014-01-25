@@ -1,5 +1,8 @@
 {% extends 'activity/activity_base.tpl' %}
 
+{% block create_nav %}class="active"{% endblock %}
+{% block activity_nav %}{% endblock %}
+
 {% block css_head %}
         <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap-editable.css" />
         <style type="text/css">

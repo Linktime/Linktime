@@ -1,4 +1,5 @@
 <div class="col-md-3">
+    {% include 'ltuser/user_info_panel.tpl' %}
     <ul class="nav nav-stacked linktime-side">
         <li><a href="{% url activity_manage pk=activity.id %}">活动介绍</a></li>
         <li><a href="{% url activity_manage_options pk=activity.id %}">活动选项</a></li>

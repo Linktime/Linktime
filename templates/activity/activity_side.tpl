@@ -1,4 +1,5 @@
 <div class="col-md-3">
+    {% include 'ltuser/user_info_panel.tpl' %}
     <ul class="nav nav-stacked linktime-side">
         <li><a href="#">活动介绍</a></li>
         <li><a href="#">电子票</a></li>

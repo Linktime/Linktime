@@ -71,11 +71,11 @@
 
       <div class="collapse navbar-collapse" id="linktime-navbar">
           <ul class="nav navbar-nav navbar-left">
-            {% if user.is_authenticated %}<li><a href="{% url user_info pk=user.ltuser.id %}">个人空间</a></li>{% endif %}
-            <li><a href="{% url activity_list %}">活动</a></li>
-            <li><a href="{% url group_list %}">好友</a></li>
+            {% if user.is_authenticated %}<li {% block user_nav %}{% endblock %}><a href="{% url user_info pk=user.ltuser.id %}">个人空间</a></li>{% endif %}
+            <li {% block activity_nav %}{% endblock %}><a href="{% url activity_list %}">活动</a></li>
+            <li {% block friend_nav %}{% endblock %}><a href="{% url group_list %}">好友</a></li>
             {% block navbar_left_li %} {% endblock %}
-            <li><a href="{% url activity_create %}">创建活动</a></li>
+            <li {% block create_nav %}{% endblock %}><a href="{% url activity_create %}">创建活动</a></li>
           </ul>
           <!--
           <form class="navbar-form navbar-left" role="search">
