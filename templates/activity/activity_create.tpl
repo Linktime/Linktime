@@ -22,12 +22,12 @@
                     {{form.name}}
                 </div>
                 <div class="activity-extra">
-                    <div class="activity-price">价格:<a href="#" id="price"></a>{{form.price}}元</div>
+                    <div class="activity-price">价格:<a href="#" id="price" title="暂时支持免费活动"></a>{{form.price}}元</div>
                     <div class="activity-date" >日期:<a href="#" id="date"></a>{{form.date}}</div>
                 </div>
                 <div class="activity-image-box">在此处添加图片（未开放）</div>
                 <div class="activity-content">
-                    <p>简介：</p>
+                    <p>简介（<font color="red">200字以内</font>）：</p>
                     <div class="activity-abstract">
                         {{form.abstract}}
                     </div>
@@ -63,10 +63,10 @@
     });
 
     $("#price").editable({
-        mode:'popup',
-        placement:'right',
-        emptytext:'xxx',
-        type:'text',
+        type:'select',
+        mode:'inline',
+        prepend:'0',
+        source:{"1":"0"},
     });
 
     $("#date").editable({

@@ -2,11 +2,6 @@
 
 {% block css_head %}
         <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap-editable.css" />
-        <style type="text/css">
-            #introduction {
-                overflow-y:scroll;word-break:normal; min-height:300px;width:100%;
-            }
-        </style>
 {% endblock %}
 
 {% block content %}
@@ -23,7 +18,7 @@
                 <div class="activity-image-box">在此处添加图片（未开放）</div>
                 <div class="activity-content">
                     简介:</br>
-                    <div class="activity-abstract">{{activity.abstract}}</div>
+                    <div class="activity-abstract"><a href="#" id="activity_abstract" data-pk="{{activity.id}}">{{activity.abstract}}</a></div>
                     <div class="hide" id="introduction_toolbar">{% include 'activity/activity_wysiwyg_toolbar.tpl' %}</div>
                     <div id="activity_introduction" data-pk="{{activity.id}}">{{activity.introduction|safe}}</div>
                     <form id="introduction_form">
@@ -40,7 +35,8 @@
                 <div class="activity-video-box">在此处添加视频（未开放）</div>
                 <div class="activity-place">地点:<a href="#" id="activity_address" data-pk="{{activity.id}}" data-title="修改地点">{{activity.address}}</a></div>
                 <div class="activity-map" >Map</div>
-            </div>
+            </div><!-- item -->
+            <div><a class="btn btn-primary pull-right" href="#">发布</a></div>
         </div>
         <!--<embed src="http://player.youku.com/player.php/sid/XNjUzNTEzMzQw/v.swf" allowFullScreen="true" quality="high" width="480" height="400" align="middle" allowScriptAccess="always" type="application/x-shockwave-flash"></embed>-->
 {% endblock %}
@@ -53,6 +49,7 @@
 <script type="text/javascript">
     var update_url="{% url ajax_activity_update pk=activity.id %}";
     var introduction_width = $("#activity_introduction").width();
+
     $(document).ready(function() {
 
         $('#activity_name').editable({
@@ -60,6 +57,19 @@
             mode:'inline',
             url:update_url,
         });
+
+        $('#activity_abstract').editable({
+            name:'abstract',
+            type:'textarea',
+            mode:'inline',
+            rows:'4',
+            showbuttons:'bottom',
+            url:update_url,
+        });
+
+        $('#activity_abstract').on('shown',function(e,editable){
+            editable.input.$input.width(introduction_width*0.95);
+        })
 
         $("#activity_address").editable({
             name:'address',

@@ -1,6 +1,7 @@
 #-*- coding:utf-8 -*-
 from django.db import models
 from django.contrib.auth.models import User
+from django.db.models.signals import post_save
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes import generic
 
@@ -89,28 +90,33 @@ class Comment(models.Model):
     def __unicode__(self):
         return u'%s:%s,Time:%s' % (self.owner.alias,self.text,self.date)
 
-class ActivityPriceType(models.Model):
+class ActivityTicket(models.Model):
+    # 票
+    owner = models.ForeignKey(GenericMember,related_name='activityticket_owner')
+    type = models.ForeignKey('ActivityTicketType',related_name='activityticket_type')
+
+    def __unicode__(self):
+        return u'%s:%s--%s' % (self.owner.username,self.type.type,self.type.activity.name)
+
+class ActivityTicketType(models.Model):
     # 票的种类
-    activity = models.ForeignKey(Activity)
+    activity = models.ForeignKey(Activity,related_name='tickettype_activity')
     type = models.CharField(max_length=20)
-    count = models.IntegerField()
+    count = models.IntegerField(null=True)
     price = models.IntegerField()
 
     def __unicode__(self):
         return u'%s:type:%s--price:%s--count:%s' % (self.activity.name,self.type,self.price,self.count)
 
-class ActivityTicket(models.Model):
-    # 票
-    owner = models.ForeignKey(GenericMember,related_name='activityticket_owner')
-    type = models.ForeignKey(ActivityPriceType,related_name='activityticket_type')
-
-    def __unicode__(self):
-        return u'%s:%s--%s' % (self.owner.username,self.type.type,self.type.activity.name)
+    def get_ticket_left(self):
+        sale = ActivityTicket.objects.filter(type=self).count()
+        return int(self.count) - sale
 
 class ActivityOptions(models.Model):
     activity = models.OneToOneField(Activity,related_name='activityoptions_activity')
-    team_flag = models.NullBooleanField(null=True)
-    team_max = models.IntegerField()
+    single_ticket_max = models.IntegerField(null=True)
+    team_flag = models.NullBooleanField(null=True,choices=((None,u"组队与个人"),(True,u"组队"),(False,u"个人")))
+    team_max = models.IntegerField(null=True)
     during = models.CharField(max_length=20)
 
     def __unicode__(self):
@@ -119,6 +125,16 @@ class ActivityOptions(models.Model):
 class ActivityTag(models.Model):
     activity = models.ForeignKey(Activity,related_name="activitytag_activity")
     category = models.CharField(max_length=30,null=True,blank=True)
+
+class ActivityTask(models.Model):
+    activity = models.ForeignKey(Activity,related_name='activitytask_activity')
+    assign = models.ManyToManyField(User,related_name='activitytask_assign')
+    task = models.CharField(max_length=200)
+    done = models.BooleanField(default=False)
+    deadline = models.DateTimeField(null=True)
+
+    def __unicode__(self):
+        return u'%s:%s' % (self.activity.name,self.task)
 
 class ActivityIntroduction(models.Model):
     activity = models.ForeignKey(Activity)
@@ -141,3 +157,16 @@ class ImageIntroduction(ActivityIntroduction):
 
     def getUrl(self):
         pass
+
+def auto_create_options(sender,**kwargs):
+    if kwargs['created'] == True:
+        activity = kwargs['instance']
+        options = ActivityOptions.objects.create(activity=activity)
+
+def auto_create_tickettype(sender,**kwargs):
+    if kwargs['created'] == True:
+        activity = kwargs['instance']
+        ticket_type = ActivityTicketType.objects.create(activity=activity,type=u"门票",price=0)
+
+post_save.connect(auto_create_options,sender=Activity)
+post_save.connect(auto_create_tickettype,sender=Activity)

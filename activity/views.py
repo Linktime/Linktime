@@ -16,7 +16,7 @@ from django.contrib import auth
 import json
 import datetime
 
-from activity.models import Activity, GenericMember, GenericOrganizer
+from activity.models import Activity, GenericMember, GenericOrganizer, ActivityTicket, ActivityTask
 from activity.forms import ActivityCreateForm
 
 class SingleObjectMixinByOrganizer(SingleObjectMixin):
@@ -50,9 +50,6 @@ class SingleObjectMixinByOrganizerAndPreparing(SingleObjectMixin):
             raise Http404
 
 class MultipleObjectMixinByParticipant(MultipleObjectMixin):
-    """
-    This mixin filters the queryset in a list-view by request.user
-    """
     def get_queryset(self):
         queryset = super(MultipleObjectMixinByParticipant, self).get_queryset()
         queryset_by_user = queryset.filter(participant__single=self.request.user,team_flag=False)
@@ -77,6 +74,9 @@ class ActivityDetailView(SingleObjectMixinByOrganizerAndPreparing,DetailView):
             organizer = context['activity'].organizer.filter(single=self.request.user,team_flag=False)
             if organizer:
                 context['organizer'] = True
+
+        ticket_types = context['activity'].tickettype_activity.filter()
+        context['ticket_types'] = ticket_types
         return context
 
 class ActivityManageDetailView(DetailView,SingleObjectMixinByOrganizer):
@@ -86,13 +86,31 @@ class ActivityManageDetailView(DetailView,SingleObjectMixinByOrganizer):
 
 class ActivityParticipantDetailView(DetailView,SingleObjectMixinByOrganizer):
     model = Activity
-    template_name = 'activity/activity_participant.tpl'
+    template_name = 'activity/activity_manage_participant.tpl'
     context_object_name = 'activity'
 
     def get_context_data(self, **kwargs):
         context = super(ActivityParticipantDetailView,self).get_context_data(**kwargs)
-        context['participants'] = context['activity'].participant.filter()
+        activity = context['activity']
+        context['activity_teams'] = activity.participant.filter(team_flag=True)
+        context['activity_singles'] = activity.participant.filter(team_flag=False)
         return context
+
+class ActivityTaskDetailView(DetailView,SingleObjectMixinByOrganizer):
+    model = Activity
+    template_name = 'activity/activity_manage_task.tpl'
+    context_object_name = 'activity'
+
+    def get_context_data(self, **kwargs):
+        context = super(ActivityTaskDetailView,self).get_context_data(**kwargs)
+        activity = context['activity']
+        context['tasks'] = activity.activitytask_activity.filter()
+        return context
+
+class ActivityOptionsDetailView(DetailView,SingleObjectMixinByOrganizer):
+    model = Activity
+    template_name = 'activity/activity_manage_options.tpl'
+    context_object_name = 'activity'
 
 class ActivityMapView(DetailView):
     model = Activity
@@ -124,8 +142,24 @@ def activity_create(request):
     return render_to_response('activity/activity_create.tpl', {'form': form}, context_instance=RequestContext(request))
 
 
-@login_required()
-def activity_join(request, pk):
+@login_required
+@csrf_exempt
+def activity_join(request,pk):
+    activity = activity = Activity.objects.get(id=pk)
+    type = request.POST.get('type')
+    type = activity.tickettype_activity.get(type=type)
+    try:
+        generic_member = activity.participant.get(single=request.user,team_flag=False)
+        ticket = ActivityTicket.objects.get(owner=generic_member,type=type)
+    except :
+        generic_member = GenericMember.objects.create(single=request.user)
+        ticket = ActivityTicket.objects.create(owner=generic_member,type=type)
+    activity.participant.add(generic_member)
+    messages.success(request, u'你已报名成功！')
+    return HttpResponseRedirect(reverse('activity_detail', kwargs={'pk': pk}))
+
+@login_required
+def old_activity_join(request, pk):
     try:
         user = request.user
         activity = Activity.objects.get(id=pk)
