@@ -73,18 +73,19 @@ def friend_add_pre(request):
     return HttpResponseRedirect(reverse("group_list"))
 
 @login_required
-def friend_add_accept(request):
+@csrf_exempt
+def ajax_friend_add_accept(request):
     notice_id = request.POST.get("notice_id")
-    group_name = request.POST.get("group_name")
+    group_name = request.POST.get("group_name",u"未分组")
     nfn = NewFriendNotice.objects.get(id=int(notice_id))
     nfn.accept(group_name)
     messages.info(request,u"您与%s已成为好友"%nfn.sender.username)
     return HttpResponseRedirect(reverse("group_list"))
 
 @login_required
-def friend_add_refuse(request):
+@csrf_exempt
+def ajax_friend_add_refuse(request):
     notice_id = request.POST.get("notice_id")
-    group_name = request.POST.get("group_name")
     nfn = NewFriendNotice.objects.get(id=int(notice_id))
     nfn.refuse()
     return HttpResponseRedirect(reverse("group_list"))

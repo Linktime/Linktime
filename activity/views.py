@@ -40,16 +40,15 @@ class SingleObjectMixinByOrganizerAndPreparing(SingleObjectMixin):
 
         object = super(SingleObjectMixinByOrganizerAndPreparing, self).get_object()
         user = auth.get_user(self.request)
-        if not user.is_anonymous():
-            organizer = object.organizer.filter(single=user,team_flag=False)
-            if organizer:
-                return object
-            else:
-                raise Http404
-        elif not object.preparing:
-            return object
-        else:
+        if object.preparing:
+            if not user.is_anonymous():
+                organizer = object.organizer.filter(single=user,team_flag=False)
+                if organizer:
+                    return object
             raise Http404
+        else :
+            return object
+
 
 class MultipleObjectMixinByParticipant(MultipleObjectMixin):
     def get_queryset(self):
@@ -130,7 +129,6 @@ def activity_create(request):
     if request.method == 'GET':
         form = ActivityCreateForm()
     else:
-        import code;code.interact(local=locals())
         form = ActivityCreateForm(request.POST)
         if form.is_valid():
             activity = form.save(commit=False)

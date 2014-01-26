@@ -94,6 +94,7 @@
               {% if not user.is_authenticated %}
             <li><a href="{% url login %}">登录</a></li>
               {% else %}
+              <li class="dropdown">{% include 'notice/notice_base.tpl' %}</li>
               <li><a href="{% url user_info pk=user.ltuser.id %}">{{user.username}}</a></li>
               <li><a href="{% url logout %}">注销</a></li>
               {% endif %}
