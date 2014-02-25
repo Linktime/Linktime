@@ -28,3 +28,7 @@
     {% endif %}
             </div>
 {% endblock %}
+
+{% block js_footer %}
+
+{% endblock %}

@@ -26,10 +26,10 @@
       }
 
       /* Set the fixed height of the footer here */
-      /*#container {*/
+      #container {
         /*padding-top: 50px;*/
-        /*margin-top: -20px;*/
-      /*}*/
+        margin-top: -20px;
+      }
       #push,
       #footer {
         height:140px;
@@ -66,7 +66,7 @@
       <span class="icon-bar"></span>
       <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="{% url index %}">LinkTime<span style="vertical-align:super;font-size:10px">Alpha</span></a>
+      <a class="navbar-brand" href="{% url index %}">LinkTime<span class="version">Alpha</span></a>
     </div>
 
       <div class="collapse navbar-collapse" id="linktime-navbar">
@@ -104,6 +104,8 @@
   </nav>
 
   <div id="container">
+    {% block index %}
+    {% endblock %}
 
     <div class="container">
       {% block container %}
@@ -119,7 +121,7 @@
     {% block js_footer %}
     {% endblock %}
 <br>
-    <p>IE内核的浏览器（包括但不限于IE，360浏览器）无法表现本站所有效果，推荐使用Firefox,Chrome或Opera等浏览器的较新版本可得到最佳浏览效果<br>IE6及更老的浏览器本站均不做支持</p><p>©  2013-2014 LinkTime </p><p>Author: <a href="http://www.renren.com/316795990/profile" target="_blank">Yang Fan</a>
+    <p>IE内核的浏览器（包括但不限于IE，360浏览器）无法表现本站所有效果，推荐使用Firefox,Chrome或Opera等浏览器的较新版本可得到最佳浏览效果<br>IE8及更老的浏览器本站均不做支持</p><p>©  2013-2014 LinkTime </p><p>Author: <a href="http://www.renren.com/316795990/profile" target="_blank">Yang Fan</a>
 </div>
 
 </body>

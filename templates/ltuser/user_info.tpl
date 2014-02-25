@@ -1,10 +1,9 @@
 {% extends 'ltuser/user_base.tpl' %}
 {% block content %}
-        <h2>TODO</h2>
-        <div class="row">
-            <div class="col-md-8 ">
-                {{ltuser.hobby}}
-                {{ltuser.user.username}}
-            </div>
-        </div>
+    <div class="user-info-detail">
+        姓名：{{ltuser.user.username}}</br>
+        爱好：{{ltuser.hobby}}</br>
+        学院：计算机工程与科学学院</br>
+        年龄：21</br>
+    </div>
 {% endblock %}

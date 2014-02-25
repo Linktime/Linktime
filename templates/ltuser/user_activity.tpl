@@ -12,7 +12,7 @@
 
 <!-- Tab panes -->
 <div class="tab-content">
-  <div class="tab-pane active" id="join">
+  <div class="tab-pane active" id="join_tab">
       {% include 'ltuser/user_participant_activity.tpl' %}
   </div>
   <div class="tab-pane" id="organize_tab"></div>

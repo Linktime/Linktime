@@ -97,6 +97,11 @@ class ActivityParticipantDetailView(DetailView,SingleObjectMixinByOrganizer):
         context['activity_singles'] = activity.participant.filter(team_flag=False)
         return context
 
+class ActivityStatisticsDetailView(DetailView,SingleObjectMixinByOrganizer):
+    model = Activity
+    template_name = 'activity/activity_manage_statistics.tpl'
+    context_object_name = 'activity'
+
 class ActivityTaskDetailView(DetailView,SingleObjectMixinByOrganizer):
     model = Activity
     template_name = 'activity/activity_manage_task.tpl'

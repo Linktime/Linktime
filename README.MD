@@ -7,6 +7,7 @@ A website to help people create and share activity
 * datepicker3.css
 * bootstrap-editable.css
 * linktimestyle.css
+* least.min.css
 
 # JS Required
 * jquery-2.0.3.min.js
@@ -16,3 +17,5 @@ A website to help people create and share activity
 * jquery.hotkeys.js
 * bootstrap-wysiwyg.js
 * bootstrap-editable.min.js
+* least.min.js
+* jquery.lazyload.min.js

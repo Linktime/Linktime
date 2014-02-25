@@ -13,7 +13,7 @@
             </thead>
             <tbody>
             {% for single in activity_singles %}
-                <tr><td><a href="{% url user_space pk=single.single.id %}">{{single.single.username}}</a></td><td>{{single.datetime|date:"Y-m-d h:i:s"}}</td>
+                <tr><td><a href="{% url user_space pk=single.single.ltuser.id %}">{{single.single.username}}</a></td><td>{{single.datetime|date:"Y-m-d h:i:s"}}</td>
                     <td><a class="btn close" title="移除" data-id="{{single.single.id}}" data-name="{{single.single.username}}">&times;</a></td>
                 </tr>
             {% endfor %}

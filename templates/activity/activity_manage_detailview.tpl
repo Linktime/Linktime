@@ -2,30 +2,49 @@
 
 {% block css_head %}
         <link rel="stylesheet" href="{{ STATIC_URL }}css/bootstrap-editable.css" />
+        <link href="{{ STATIC_URL }}css/least.min.css" rel="stylesheet" />
 {% endblock %}
 
 {% block content %}
+        <div class="create-step">
+            <table class="table" align="center">
+                <tbody>
+                    <tr><td><div class="step-bg">I.</div>创建</td><td><div class="step-bg">II.</div>筹备</td><td><div class="step-bg">III.</div>发布</td></tr>
+                </tbody>
+            </table>
+            <div class="progress progress-striped active">
+              <div class="progress-bar progress-bar-success" style="width: 33.3%"></div>
+              <div class="progress-bar progress-bar-warning" style="width: 33.3%"></div>
+                {% if activity.preparing %}
+                {% else %}
+              <div class="progress-bar progress-bar-danger" style="width: 33.3%"></div>
+                {% endif %}
+            </div>
+        </div>
+
         <div class="activity-detail" >
             <div class="activity-item">
                 <div class="activity-title">
                     <a href="#" id="activity_name" data-type="text" data-pk="{{activity.id}}" data-title="修改用户名">{{activity.name}}</a>
+                </div>
+                <div class="activity-content">
+                    简介:</br>
+                    <div class="activity-abstract"><a href="#" id="activity_abstract" data-pk="{{activity.id}}">{{activity.abstract}}</a></div>
                 </div>
                 <div class="activity-extra">
                     <div class="activity-price">
                         价格:<a href="#" id="activity_price" data-type="text" data-pk="{{activity.id}}" data-title="修改价格">{% if activity.price = 0 %}<span class="label label-success">Free</span>{% else %}{{activity.price}}{% endif %}</a></div>
                     <div class="activity-date" >日期:<a href="#" id="activity_date" data-pk="{{activity.id}}" data-title="修改时间">{{activity.date|date:"Y-m-d"}}</a></div>
                 </div>
-                <div class="activity-image-box">在此处添加图片（未开放）</div>
+                <div class="activity-image-box">{% include 'activity/activity_image.tpl' %}</div>
                 <div class="activity-content">
-                    简介:</br>
-                    <div class="activity-abstract"><a href="#" id="activity_abstract" data-pk="{{activity.id}}">{{activity.abstract}}</a></div>
                     <div class="hide" id="introduction_toolbar">{% include 'activity/activity_wysiwyg_toolbar.tpl' %}</div>
-                    <div id="activity_introduction" data-pk="{{activity.id}}">{{activity.introduction|safe}}</div>
+                    <div id="activity_introduction" class="activity-introduction" data-pk="{{activity.id}}">{{activity.introduction|safe}}</div>
                     <form id="introduction_form">
                     <input name="name" class="hide" value="introduction">
                     <input name="pk" class="hide" value="{{activity.id}}">
                     <textarea name="value" class="hide"></textarea>
-                    <div id="introduction" class="form-control hide"></div>
+                    <div id="introduction" class="form-control activity-introduction hide"></div>
                     </form>
                     <div id="editable-buttons" class="editable-buttons hide">
                             <button type="submit" class="btn btn-primary btn-sm editable-submit"><i class="glyphicon glyphicon-ok"></i></button>
@@ -36,7 +55,9 @@
                 <div class="activity-place">地点:<a href="#" id="activity_address" data-pk="{{activity.id}}" data-title="修改地点">{{activity.address}}</a></div>
                 <div class="activity-map" >Map</div>
             </div><!-- item -->
+            {% if activity.preparing %}
             <div><a class="btn btn-primary pull-right" href="#">发布</a></div>
+            {% endif %}
         </div>
         <!--<embed src="http://player.youku.com/player.php/sid/XNjUzNTEzMzQw/v.swf" allowFullScreen="true" quality="high" width="480" height="400" align="middle" allowScriptAccess="always" type="application/x-shockwave-flash"></embed>-->
 {% endblock %}
@@ -46,6 +67,9 @@
 <script src="{{ STATIC_URL }}js/bootstrap-editable.min.js"></script>
 <script src="{{ STATIC_URL }}js/jquery.hotkeys.js"></script>
 <script src="{{ STATIC_URL }}js/bootstrap-wysiwyg.js"></script>
+<script src="{{ STATIC_URL }}js/least.min.js" defer="defer"></script>
+<!-- Lazyload JS-file -->
+<script src="{{ STATIC_URL }}js/jquery.lazyload.min.js" defer="defer"></script>
 <script type="text/javascript">
     var update_url="{% url ajax_activity_update pk=activity.id %}";
     var introduction_width = $("#activity_introduction").width();
@@ -164,5 +188,10 @@
             },
         });
     });
+
+    //Image
+    $(document).ready(function(){
+                $('#gallery').least();
+            });
 </script>
 {% endblock %}

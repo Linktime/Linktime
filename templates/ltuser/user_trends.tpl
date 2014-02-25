@@ -1,4 +1,4 @@
 {% extends 'ltuser/user_base.tpl' %}
 {% block content %}
-    <h3>TODO..</h3>
+    <div class="alert alert-info">没有任何新消息</div>
 {% endblock %}
