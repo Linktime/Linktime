@@ -44,7 +44,9 @@
                         {{activity.introduction|safe}}
                     </div>
                 </div>
-                <div class="activity-video-box">在此处添加视频（未开放）</div>
+                <div class="activity-video-box">在此处添加视频（未开放）
+                    {% include 'activity/activity_video.tpl' %}
+                </div>
                 <div class="activity-place">地点:{{activity.address}}</div>
                 <div class="activity-map" >Map</div>
             </div>
@@ -67,6 +69,7 @@
             $(document).ready(function(){
                 $('#gallery').least();
             });
+
         </script>
 
 

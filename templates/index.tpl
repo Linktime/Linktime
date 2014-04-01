@@ -53,6 +53,7 @@
   </div>
 </div> <!-- jumbotron -->
 
+<!--
 <div class="server">
     <div class="title">
 
@@ -100,6 +101,7 @@
     <div class="server-body">
     </div>
 </div>
+-->
 
 <div class="use-data">
     <div class="use-item-1"><h3><font size="18px">48</font>个活动现在正在进行</h3></div>

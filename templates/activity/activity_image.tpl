@@ -1,4 +1,4 @@
-<section>
+<section style="min-height:100px;"> <!-- FIX bug on chrome -->
     <ul id="gallery">
         <li id="fullPreview"></li>
 

@@ -25,7 +25,7 @@
         <div class="activity-detail" >
             <div class="activity-item">
                 <div class="activity-title">
-                    <a href="#" id="activity_name" data-type="text" data-pk="{{activity.id}}" data-title="修改用户名">{{activity.name}}</a>
+                    {% if activity.preparing %}[筹备中]{% endif %}<a href="#" id="activity_name" data-type="text" data-pk="{{activity.id}}" data-title="修改活动名">{{activity.name}}</a>
                 </div>
                 <div class="activity-content">
                     简介:</br>
@@ -56,7 +56,7 @@
                 <div class="activity-map" >Map</div>
             </div><!-- item -->
             {% if activity.preparing %}
-            <div><a class="btn btn-primary pull-right" href="#">发布</a></div>
+            <div><a class="btn btn-primary pull-right" href="{% url activity_release pk=activity.id %}">发布</a></div>
             {% endif %}
         </div>
         <!--<embed src="http://player.youku.com/player.php/sid/XNjUzNTEzMzQw/v.swf" allowFullScreen="true" quality="high" width="480" height="400" align="middle" allowScriptAccess="always" type="application/x-shockwave-flash"></embed>-->

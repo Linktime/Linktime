@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 # Create your views here.
 
-from django.http import HttpResponseRedirect, Http404
+from django.http import HttpResponseRedirect, Http404, HttpResponse
 from django.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
 from django.views.generic.list import MultipleObjectMixin
@@ -80,6 +80,7 @@ def ajax_friend_add_accept(request):
     nfn = NewFriendNotice.objects.get(id=int(notice_id))
     nfn.accept(group_name)
     messages.info(request,u"您与%s已成为好友"%nfn.sender.username)
+    # FIXME 此处应该在客户端对返回数据检验，通知用户是否添加成功
     return HttpResponseRedirect(reverse("group_list"))
 
 @login_required
@@ -89,6 +90,15 @@ def ajax_friend_add_refuse(request):
     nfn = NewFriendNotice.objects.get(id=int(notice_id))
     nfn.refuse()
     return HttpResponseRedirect(reverse("group_list"))
+
+@login_required
+@csrf_exempt
+def ajax_friend_read_accept_notice(request):
+    user = request.user
+    is_accept = IsAcceptFriendNotice.objects.filter(receiver=user,had_read=False)
+    is_accept.update(had_read=True)
+    # FIXME
+    return HttpResponse("xxx")
 
 @login_required
 def friend_remove(request):

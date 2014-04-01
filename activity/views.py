@@ -60,7 +60,7 @@ class ActivityListView(ListView):
     model = Activity
     template_name = 'activity/activity_listview.tpl'
     context_object_name = 'activitys'
-    paginate_by = 20
+    paginate_by = 15
 
 
 class ActivityDetailView(SingleObjectMixinByOrganizerAndPreparing,DetailView):
@@ -147,6 +147,19 @@ def activity_create(request):
             messages.warning(request, u'请重新确认您输入的信息是否有误！%s'%form.errors)
     return render_to_response('activity/activity_create.tpl', {'form': form}, context_instance=RequestContext(request))
 
+@login_required
+def activity_release(request,pk):
+    activity = Activity.objects.get(id=pk)
+    user = request.user
+    try :
+        organizer = activity.organizer.filter(single=user,team_flag=False)
+        if organizer:
+            activity.preparing = False
+            activity.save()
+            return HttpResponseRedirect(reverse('activity_detail',kwargs={'pk':pk}))
+    except:
+        pass
+    return HttpResponseRedirect(reverse('activity_manage_detail'),kwargs={'pk':pk})
 
 @login_required
 @csrf_exempt

@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 from activity.views import ActivityListView, ActivityDetailView, ActivityManageDetailView, \
     ActivityParticipantDetailView, ActivityOptionsDetailView,ActivityTaskDetailView, ActivityStatisticsDetailView
 from activity.views import activity_create, activity_join, activity_join_cancel, activity_mark, activity_mark_cancel, ajax_activity_update
+from activity.views import activity_release
 from activity.models import Activity
 
 urlpatterns = patterns('',
@@ -16,6 +17,7 @@ urlpatterns = patterns('',
     url(r'^(?P<pk>\d*)/manage/$',login_required(ActivityManageDetailView.as_view()),name="activity_manage"),
     url(r'^(?P<pk>\d*)/manage/options/$',login_required(ActivityOptionsDetailView.as_view()),name="activity_manage_options"),
     url(r'^(?P<pk>\d*)/manage/task/$',login_required(ActivityTaskDetailView.as_view()),name="activity_manage_task"),
+    url(r'^(?P<pk>\d*)/manage/release/$',activity_release,name="activity_release"),
     url(r'^(?P<pk>\d*)/manage/update/$',ajax_activity_update,name="ajax_activity_update"),
     url(r'^(?P<pk>\d*)/manage/participant/$',login_required(ActivityParticipantDetailView.as_view()),name="activity_manage_participant"),
     url(r'^(?P<pk>\d*)/manage/statistics/$',login_required(ActivityStatisticsDetailView.as_view()),name="activity_manage_statistics"),

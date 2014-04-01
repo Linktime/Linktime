@@ -1,7 +1,7 @@
 {% extends 'ltuser/user_base.tpl' %}
 {% block content %}
 {% if not teams %}
-    <div class="alert alert-warning">你还没有参加任何团队哦</div>
+    <div class="alert alert-warning">你还没有参加任何团队哦，<a href="#">寻找我的团队</a>或者<a href="#">创建一个团队</a></div>
 {% endif %}
 
 <div class="team-list">
