@@ -54,7 +54,7 @@ class OwnerObjectsOnlyAuthorization(Authorization):
         return bundle.obj.owner == bundle.request.user
 
 class ActivityResource(ModelResource):
-    ticket_type = fields.ToManyField('activity.api.ActivityTicketTypeResource',"tickettype_activity",full=True)
+    ticket_type = fields.ToManyField('activity.api.ActivityTicketTypeResource',"tickettype_activity")
     class Meta:
         queryset = Activity.objects.select_related().filter(preparing=False)
         resource_name = "activity/activity"

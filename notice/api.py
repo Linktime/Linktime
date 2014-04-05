@@ -94,7 +94,7 @@ class NewFriendNoticeResource(ModelResource):
         authentication = ApiKeyAuthentication()
         authorization = SenderObjectsOnlyAuthorization()
 
-class NewFriendNoticeResource(ModelResource):
+class AcceptFriendNoticeResource(ModelResource):
     sender = fields.ForeignKey(UserResource,'sender')
     receiver = fields.ForeignKey(UserResource,'receiver')
     class Meta:
