@@ -4,9 +4,15 @@ from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 
 # Create your models here.
+
+# class Friendship(models.Model):
+#     owner = models.ForeignKey(User,related_name='friendship_owner')
+#     group = models.ForeignKey(Group,related_name='friendship_group')
+
 class Group(models.Model):
     #用户好友分组模型
     name = models.CharField(max_length=30)
+    # member = models.ManyToManyField(User,related_name="group_member",through=Friendship)
     member = models.ManyToManyField(User,related_name="group_member")
     owner = models.ForeignKey(User,related_name="group_owner")
     def __unicode__(self):

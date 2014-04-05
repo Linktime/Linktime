@@ -6,7 +6,7 @@ from django.db.models.signals import pre_save, pre_delete, post_save
 from django.core.urlresolvers import reverse
 
 from django.contrib.auth.models import User
-from activity.models import Activity
+from activity.models import Activity, ActivityTicketType
 from friend.models import Group
 from ltuser.models import Message, MessageBoard
 # Create your models here.
@@ -46,7 +46,8 @@ class NewFriendNotice(Notice):
     # event should be friend_new
     sender = models.ForeignKey(User)
     accept = models.NullBooleanField(null=True,blank=True)
-    group_name = models.CharField(max_length=30)
+    group_name = models.CharField(max_length=30,default=u'未分组')
+
     def __unicode__(self):
         return "%s--friend--%s"%(self.receiver,self.sender)
 
@@ -77,13 +78,15 @@ def user_message(sender,**kwargs):
 def activity_modify(sender,**kwargs):
     if not kwargs['created'] :
         activity = kwargs['instance']
-        for user in activity.participant.all():
-            ActivityNotice.objects.create(recevier=user,activity=activity,event="activity_modify",url=reverse('activity_detail',kwargs={'pk':activity.id}))
+        types = ActivityTicketType.objects.filter(activity=activity)
+        for type in types:
+            for user in type.single.filter():
+                ActivityNotice.objects.create(receiver=user,activity=activity,event="activity_modify",url=reverse('activity_detail',kwargs={'pk':activity.id}))
 
 def activity_delete(sender,**kwargs):
     activity = kwargs['instance']
     for user in activity.participant.all():
-        ActivityDeleteNotice.objects.create(recevier=user,creator=activity.creator,event="activity_delete",url=reverse('activity_detail',kwargs={'pk':activity.id}))
+        ActivityDeleteNotice.objects.create(receiver=user,creator=activity.creator,event="activity_delete",url=reverse('activity_detail',kwargs={'pk':activity.id}))
 
 post_save.connect(activity_modify,sender=Activity)
 pre_delete.connect(activity_delete,sender=Activity)

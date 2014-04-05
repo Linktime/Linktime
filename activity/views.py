@@ -12,11 +12,12 @@ from django.shortcuts import render_to_response, Http404
 from django.contrib.admin.models import User
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import auth
+from django.db.models import Q
 
 import json
 import datetime
 
-from activity.models import Activity, GenericMember, GenericOrganizer, ActivityTicket, ActivityTask
+from activity.models import Activity, ActivityTicketType,ActivityTicket, ActivityTeamTicket, ActivityOrganizerList, ActivityTask, ActivitySingleOrganizer
 from activity.forms import ActivityCreateForm
 
 class SingleObjectMixinByOrganizer(SingleObjectMixin):
@@ -26,8 +27,8 @@ class SingleObjectMixinByOrganizer(SingleObjectMixin):
     def get_object(self):
         object = super(SingleObjectMixinByOrganizer, self).get_object()
         user = auth.get_user(self.request)
-        organizer = object.organizer.filter(single=user,team_flag=False)
-        if organizer:
+        organizer_list = object.organizer_list_activity.filter(Q(single=user)|Q(team__member=user))
+        if organizer_list:
             return object
         else:
             raise Http404
@@ -42,19 +43,12 @@ class SingleObjectMixinByOrganizerAndPreparing(SingleObjectMixin):
         user = auth.get_user(self.request)
         if object.preparing:
             if not user.is_anonymous():
-                organizer = object.organizer.filter(single=user,team_flag=False)
-                if organizer:
+                organizer_list = object.organizer_list_activity.filter(Q(single=user)|Q(team__member=user))
+                if organizer_list:
                     return object
             raise Http404
         else :
             return object
-
-
-class MultipleObjectMixinByParticipant(MultipleObjectMixin):
-    def get_queryset(self):
-        queryset = super(MultipleObjectMixinByParticipant, self).get_queryset()
-        queryset_by_user = queryset.filter(participant__single=self.request.user,team_flag=False)
-        return queryset_by_user
 
 class ActivityListView(ListView):
     model = Activity
@@ -72,7 +66,7 @@ class ActivityDetailView(SingleObjectMixinByOrganizerAndPreparing,DetailView):
         context = super(ActivityDetailView,self).get_context_data(**kwargs)
         user = auth.get_user(self.request)
         if not user.is_anonymous():
-            organizer = context['activity'].organizer.filter(single=self.request.user,team_flag=False)
+            organizer = context['activity'].organizer_list_activity.filter(Q(single=self.request.user)|Q(team__member=self.request.user))
             if organizer:
                 context['organizer'] = True
 
@@ -93,8 +87,7 @@ class ActivityParticipantDetailView(DetailView,SingleObjectMixinByOrganizer):
     def get_context_data(self, **kwargs):
         context = super(ActivityParticipantDetailView,self).get_context_data(**kwargs)
         activity = context['activity']
-        context['activity_teams'] = activity.participant.filter(team_flag=True)
-        context['activity_singles'] = activity.participant.filter(team_flag=False)
+        context['activity_tickettype'] = ActivityTicketType.objects.filter(activity=activity)
         return context
 
 class ActivityStatisticsDetailView(DetailView,SingleObjectMixinByOrganizer):
@@ -139,8 +132,8 @@ def activity_create(request):
             activity = form.save(commit=False)
             activity.creator = request.user
             activity.save()
-            generic_object = GenericOrganizer.objects.create(single=request.user)
-            activity.organizer.add(generic_object)
+            organizer_list = ActivityOrganizerList.objects.create(activity=activity)
+            organizer_single = ActivitySingleOrganizer.objects.create(organizer_list=organizer_list,user=request.user)
             messages.success(request, u'活动已创建成功！')
             return HttpResponseRedirect(reverse('activity_manage', kwargs={'pk': activity.id}))
         else:
@@ -152,56 +145,39 @@ def activity_release(request,pk):
     activity = Activity.objects.get(id=pk)
     user = request.user
     try :
-        organizer = activity.organizer.filter(single=user,team_flag=False)
+        organizer = activity.organizer_list_activity.filter(Q(single=user)|Q(team__member=user))
         if organizer:
             activity.preparing = False
             activity.save()
             return HttpResponseRedirect(reverse('activity_detail',kwargs={'pk':pk}))
-    except:
+    except :
         pass
-    return HttpResponseRedirect(reverse('activity_manage_detail'),kwargs={'pk':pk})
+    return HttpResponseRedirect(reverse('activity_manage',kwargs={'pk':pk}))
 
 @login_required
 @csrf_exempt
-def activity_join(request,pk):
+def activity_single_join(request,pk):
     activity = activity = Activity.objects.get(id=pk)
     type = request.POST.get('type')
     type = activity.tickettype_activity.get(type=type)
     try:
-        generic_member = activity.participant.get(single=request.user,team_flag=False)
-        ticket = ActivityTicket.objects.get(owner=generic_member,type=type)
+        activity_ticket = ActivityTicket.objects.get(owner=request.user,type=type)
     except :
-        generic_member = GenericMember.objects.create(single=request.user)
-        ticket = ActivityTicket.objects.create(owner=generic_member,type=type)
-    activity.participant.add(generic_member)
+        activity_ticket = ActivityTicket.objects.create(owner=request.user,type=type)
     messages.success(request, u'你已报名成功！')
-    return HttpResponseRedirect(reverse('activity_detail', kwargs={'pk': pk}))
-
-@login_required
-def old_activity_join(request, pk):
-    try:
-        user = request.user
-        activity = Activity.objects.get(id=pk)
-        user_object = activity.participant.filter(single=request.user,team_flag=False)
-        if user_object:
-            messages.info(request, u'你已报名成功，无须重复报名')
-        else:
-            user_object = GenericOrganizer.objects.create(single=request.user)
-            activity.participant.add(user_object)
-            messages.success(request, u'你已报名成功！')
-    except Activity.DoesNotExist:
-        messages.error(request, u'您要参加的活动不存在，请重新确认！')
     return HttpResponseRedirect(reverse('activity_detail', kwargs={'pk': pk}))
 
 
 @login_required()
-def activity_join_cancel(request, pk):
+def activity_single_join_cancel(request, pk):
     try:
         user = request.user
         activity = Activity.objects.get(id=pk)
+        type = request.POST.get('type')
+        type = activity.tickettype_activity.get(type=type)
         try :
-            user_object = activity.participant.get(single=request.user.id,team_flag=False)
-            activity.participant.remove(user_object)
+            activity_ticket = ActivityTicket.objects.get(owner=request.user,type=type)
+            activity_ticket.delete()
             messages.info(request, u'你已取消报名！')
         except:
             messages.warning(request, u'你未报名该活动！')

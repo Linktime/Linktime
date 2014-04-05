@@ -31,34 +31,6 @@ class ActivityTeam(Team):
     # 活动分组
     pass
 
-class GenericMember(models.Model):
-    # content_type = models.ForeignKey(ContentType)
-    # object_id = models.PositiveIntegerField()
-    # content_object = generic.GenericForeignKey('content_type', 'object_id')
-    single = models.ForeignKey(User,related_name="genericmember_single",null=True)
-    team = models.ForeignKey(ActivityTeam,related_name="genericmember_team",null=True)
-    team_flag = models.BooleanField(default=False)
-    datetime = models.DateTimeField(auto_now=True)
-
-    def get_name(self):
-        if self.team_flag :
-            return self.team.name
-        else :
-            return self.single.username
-
-class GenericOrganizer(models.Model):
-    single = models.ForeignKey(User,related_name="genericorganizer_single",null=True)
-    team = models.ForeignKey(ActivityTeam,related_name="genericorganizer_team",null=True)
-    team_flag = models.BooleanField(default=False)
-    datetime = models.DateTimeField(auto_now=True)
-    level = models.CharField(max_length=10,default="1")
-    
-    def get_name(self):
-        if self.team_flag :
-            return self.team.name
-        else :
-            return self.single.username
-
 
 class Activity(models.Model):
     #活动模型
@@ -73,9 +45,8 @@ class Activity(models.Model):
     preparing = models.BooleanField(default=True)
     lbs = models.OneToOneField(Lbs,null=True,blank=True)
     creator = models.ForeignKey(User,related_name='activity_creator')
-    organizer = models.ManyToManyField(GenericOrganizer,related_name="activity_organizer")
-    sponsor = models.ManyToManyField(GenericOrganizer,related_name="activity_sponsor",blank=True)
-    participant = models.ManyToManyField(GenericMember,related_name="activity_participant",blank=True)
+    # organizer = models.OneToOneField('ActivityOrganizerList',related_name="activity_organizer")
+    # participant = models.ManyToManyField('ActivityTicketType',related_name="activity_participant",blank=True)
 
     def __unicode__(self):
         return u"%s" % self.name
@@ -92,8 +63,18 @@ class Comment(models.Model):
 
 class ActivityTicket(models.Model):
     # 票
-    owner = models.ForeignKey(GenericMember,related_name='activityticket_owner')
-    type = models.ForeignKey('ActivityTicketType',related_name='activityticket_type')
+    owner = models.ForeignKey(User,related_name='single_ticket_owner')
+    type = models.ForeignKey('ActivityTicketType',related_name='single_ticket_type')
+    datetime = models.DateTimeField(auto_now=True)
+
+    def __unicode__(self):
+        return u'%s:%s--%s' % (self.owner.username,self.type.type,self.type.activity.name)
+
+class ActivityTeamTicket(models.Model):
+    # 票
+    owner = models.ForeignKey(ActivityTeam,related_name='teamticket_owner')
+    type = models.ForeignKey('ActivityTicketType',related_name='teamticket_type')
+    datetime = models.DateTimeField(auto_now=True)
 
     def __unicode__(self):
         return u'%s:%s--%s' % (self.owner.username,self.type.type,self.type.activity.name)
@@ -101,6 +82,9 @@ class ActivityTicket(models.Model):
 class ActivityTicketType(models.Model):
     # 票的种类
     activity = models.ForeignKey(Activity,related_name='tickettype_activity')
+    single = models.ManyToManyField(User,related_name='tickettype_single',through=ActivityTicket)
+    team = models.ManyToManyField(ActivityTeam,related_name='tickettype_team',through=ActivityTeamTicket)
+
     type = models.CharField(max_length=20)
     count = models.IntegerField(null=True)
     price = models.IntegerField()
@@ -109,8 +93,22 @@ class ActivityTicketType(models.Model):
         return u'%s:type:%s--price:%s--count:%s' % (self.activity.name,self.type,self.price,self.count)
 
     def get_ticket_left(self):
+        # FIXME
         sale = ActivityTicket.objects.filter(type=self).count()
         return int(self.count) - sale
+
+class ActivitySingleOrganizer(models.Model):
+    user = models.ForeignKey(User,related_name='single_organizer_user')
+    organizer_list = models.ForeignKey('ActivityOrganizerList',related_name='single_organizer_organizer_list')
+
+class ActivityTeamOrganizer(models.Model):
+    team = models.ForeignKey(Team,related_name='team_organizer_team')
+    organizer_list = models.ForeignKey('ActivityOrganizerList',related_name='team_organizer_organizer_list')
+
+class ActivityOrganizerList(models.Model):
+    activity = models.ForeignKey(Activity,related_name='organizer_list_activity')
+    single = models.ManyToManyField(User,related_name='organizer_list_single',through=ActivitySingleOrganizer)
+    team = models.ManyToManyField(Team,related_name='organizer_list_team',through=ActivityTeamOrganizer)
 
 class ActivityOptions(models.Model):
     activity = models.OneToOneField(Activity,related_name='activityoptions_activity')

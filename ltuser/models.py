@@ -5,6 +5,8 @@ from activity.models import Activity, Team
 
 from django.contrib.auth.models import User
 
+from tastypie.models import create_api_key
+
 # Create your models here.
 
 class Ltuser(models.Model):
@@ -38,3 +40,5 @@ class MessageBoard(models.Model):
     receiver = models.ForeignKey(User,related_name="message_board_receiver")
     def __unicode__(self):
         return u'%s回复%s:%s' % (self.sender.alias,self.receiver.alias,self.text)
+
+models.signals.post_save.connect(create_api_key, sender=User)

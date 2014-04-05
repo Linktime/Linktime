@@ -78,7 +78,7 @@ class MultipleObjectMixinByParticipant(MultipleObjectMixin):
     """
     def get_queryset(self):
         queryset = super(MultipleObjectMixinByParticipant, self).get_queryset()
-        queryset_by_user = queryset.filter(participant__single=self.request.user,participant__team_flag=False)
+        queryset_by_user = queryset.filter(Q(tickettype_activity__single=self.request.user)|Q(tickettype_activity__team__member=self.request.user))
         return queryset_by_user
 
 class MultipleObjectMixinByOrganizer(MultipleObjectMixin):
@@ -87,7 +87,7 @@ class MultipleObjectMixinByOrganizer(MultipleObjectMixin):
     """
     def get_queryset(self):
         queryset = super(MultipleObjectMixinByOrganizer, self).get_queryset()
-        queryset_by_user = queryset.filter(organizer__single=self.request.user,organizer__team_flag=False)
+        queryset_by_user = queryset.filter(Q(organizer_list_activity__single=self.request.user)|Q(organizer_list_activity__team__member=self.request.user))
         return queryset_by_user
 
 class MultipleObjectMixinByCreator(MultipleObjectMixin):
@@ -112,6 +112,7 @@ class MultipleObjectMixinBySponsor(MultipleObjectMixin):
     """
     This mixin filters the queryset in a list-view by request.user
     """
+    # FIXME
     def get_queryset(self):
         queryset = super(MultipleObjectMixinBySponsor, self).get_queryset()
         queryset_by_user = queryset.filter(sponsor__single=self.request.user,sponsor__team_flag=False)
