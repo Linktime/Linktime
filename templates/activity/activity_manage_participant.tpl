@@ -6,7 +6,7 @@
     {% else %}
         <div class="participant-list">
         {% for tickettype in activity_tickettype %}
-        <div><b>{{tickettype.type}}:</b></div>
+        <div><b>票务类型：{{tickettype.type}}</b></div>
         <div class="participant-single"><div class="participant-title">个人报名</div>
             <table class="table table-hover">
             <thead>

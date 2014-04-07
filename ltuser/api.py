@@ -63,6 +63,17 @@ class UserResource(ModelResource):
             'username':ALL,
         }
 
+class SimpleUserResource(ModelResource):
+    class Meta:
+        queryset = User.objects.select_related().filter()
+        resource_name = "ltuser/simpleuser"
+        allowed_method = ['get',]
+        serializer = Serializer(formats=['json',])
+        fields = ["username","id"]
+        filtering = {
+            'username':ALL,
+        }
+
 @csrf_exempt
 def mobile_register(request):
     register_success = False

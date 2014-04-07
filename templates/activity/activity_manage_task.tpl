@@ -17,4 +17,16 @@
                 </tbody>
             </table>
         </div>
+        {% if user = activity.creator %}
+        <div class="add-task">
+            <a class="btn btn-primary" href="#">添加事务</a>
+        </div>
+        <div>
+            <form method="post" action="#">
+                <input name="task" placeholder="任务内容">
+                <input name="assign" placeholder="指派人">
+                <input name="deadline" placeholder="截止日期">
+            </form>
+        </div>
+        {% endif %}
 {% endblock %}

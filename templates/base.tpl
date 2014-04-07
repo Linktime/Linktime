@@ -66,7 +66,9 @@
       <span class="icon-bar"></span>
       <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand" href="{% url index %}">LinkTime<span class="version">Alpha</span></a>
+      <a class="navbar-brand" href="{% url index %}">LinkTime&nbsp;&nbsp;
+          <!--<span class="version">Alpha</span>-->
+      </a>
     </div>
 
       <div class="collapse navbar-collapse" id="linktime-navbar">

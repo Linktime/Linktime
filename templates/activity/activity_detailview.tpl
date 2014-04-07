@@ -22,6 +22,17 @@
                     <p>简介：</p>
                     <div class="activity-abstract">{{activity.abstract}}</div>
                 </div>
+                <div class="activity-organizer"><b>活动组织者:</b><br>
+                    {% for organizer in activity.organizer_list_activity.all %}
+                        {% for single in organizer.single.all %}
+                            <a type="button" class="btn btn-default" href="{% url user_space pk=single.ltuser.id %}">{{ single.username }}</a>
+                        {% endfor %}
+                        <br>
+                        {% for team in organizer.single.all %}
+                            {{ team.name }}
+                        {% endfor %}
+                    {% endfor %}
+                </div>
                 <div class="activity-extra">
                     <div class="activity-price">
                         <form id="ticket_form" action="{% url activity_single_join pk=activity.id %}" method="post">
