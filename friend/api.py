@@ -49,6 +49,7 @@ class UserObjectsOnlyAuthorization(Authorization):
         return bundle.obj.owner == bundle.request.user
 
 class GroupResource(ModelResource):
+    owner = fields.ForeignKey(SimpleUserResource,'owner')
     member = fields.ManyToManyField(SimpleUserResource,'member',full=True)
     class Meta:
         queryset = Group.objects.select_related().filter()
@@ -56,6 +57,7 @@ class GroupResource(ModelResource):
         allowed_method = ['get',]
         serializer = Serializer(formats=['json',])
         authentication = ApiKeyAuthentication()
+        authorization = UserObjectsOnlyAuthorization()
         filtering = {
             'name':ALL,
         }
