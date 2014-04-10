@@ -147,6 +147,8 @@ def mobile_get_qrcode(request,pk,tid):
     except:
         return HttpResponseForbidden()
 
+def mobile_activity_nearby(request):
+    return render_to_response('activity/mobile_activity_nearby.tpl')
 
 @login_required()
 def activity_create(request):
@@ -154,10 +156,13 @@ def activity_create(request):
         form = ActivityCreateForm()
     else:
         form = ActivityCreateForm(request.POST)
+        # FIXME
+        lat = request.POST.get("lat")
+        lng = request.POST.get("lng")
         if form.is_valid():
             activity = form.save(commit=False)
             activity.creator = request.user
-            activity.lbs = Lbs.objects.create(lat=120.0000,lng=163.000)
+            activity.lbs = Lbs.objects.create(lat=float(lat),lng=float(lng))
             activity.save()
             organizer_list = ActivityOrganizerList.objects.create(activity=activity)
             organizer_single = ActivitySingleOrganizer.objects.create(organizer_list=organizer_list,user=request.user)

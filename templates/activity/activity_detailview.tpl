@@ -7,6 +7,12 @@
 
 {% block css_head %}
         <link href="{{ STATIC_URL }}css/least.min.css" rel="stylesheet" />
+        <style type="text/css">
+            html,body {
+            width:100%;
+            heigth:100%;
+            }
+        </style>
 {% endblock %}
 
 {% block side %}
@@ -59,7 +65,7 @@
                     {% include 'activity/activity_video.tpl' %}
                 </div>
                 <div class="activity-place">地点:{{activity.address}}</div>
-                <div class="activity-map" >Map</div>
+                <div class="activity-map" ><div id="map"></div></div>
             </div>
         </div>
         <!--<embed src="http://player.youku.com/player.php/sid/XNjUzNTEzMzQw/v.swf" allowFullScreen="true" quality="high" width="480" height="400" align="middle" allowScriptAccess="always" type="application/x-shockwave-flash"></embed>-->
@@ -83,6 +89,19 @@
                 $('#gallery').least();
             });
 
+        </script>
+        <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=tWoFM89fYumwstH3RLwVbYme"></script>
+        <script type="text/javascript">
+            // 百度地图API功能
+            var map = new BMap.Map("map");            // 创建Map实例
+            var point = new BMap.Point({{activity.lbs.lng}},{{activity.lbs.lat}});
+            map.centerAndZoom(point,16);
+            map.addControl(new BMap.NavigationControl());  //添加默认缩放平移控件
+            map.enableScrollWheelZoom();
+            var marker = new BMap.Marker(point);
+            map.addOverlay(marker);
+            marker.setTitle("{{activity.name}}");
+            marker.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
         </script>
 
 

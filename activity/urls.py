@@ -7,7 +7,7 @@ from activity.views import activity_create, activity_single_join, activity_singl
 from activity.views import activity_release
 from activity.models import Activity
 
-from activity.views import activity_qrcode
+from activity.views import activity_qrcode,mobile_activity_nearby
 
 urlpatterns = patterns('',
     url(r'^$',ActivityListView.as_view(queryset=Activity.objects.filter(preparing=False).order_by('create_date')),name='activity_list'),
@@ -27,4 +27,5 @@ urlpatterns = patterns('',
     url(r'^(?P<pk>\d*)/manage/statistics/$',login_required(ActivityStatisticsDetailView.as_view()),name="activity_manage_statistics"),
 
     url(r'^(?P<pk>\d*)/qrcode_img/$',activity_qrcode,name="activity_qrcode_img"),
+    url(r'^mobile_activity_nearby/$',mobile_activity_nearby),
 )
