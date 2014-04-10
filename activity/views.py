@@ -19,6 +19,11 @@ import datetime
 
 from activity.models import Activity, ActivityTicketType,ActivityTicket, ActivityTeamTicket, ActivityOrganizerList, ActivityTask, ActivitySingleOrganizer
 from activity.forms import ActivityCreateForm
+from activity.util import get_qrcode
+
+from place.models import Lbs
+
+from tastypie.models import ApiKey
 
 class SingleObjectMixinByOrganizer(SingleObjectMixin):
     """
@@ -121,6 +126,27 @@ class ActivityQrCodeView(DetailView):
     template_name = 'activity/activity_qrcode.tpl'
     context_object_name = 'activity'
 
+@login_required
+def activity_qrcode(request,pk):
+    at = ActivityTicket.objects.all()[0]
+    qr = get_qrcode(at)
+    return HttpResponse(qr,mimetype='image/png')
+
+# DIY
+def mobile_get_qrcode(request,pk,tid):
+    username = request.GET.get("username")
+    api_key = request.GET.get("api_key")
+    try:
+        user = User.objects.get(username=username)
+        apikey = ApiKey.objects.get(user=user,key=api_key)
+        activity = Activity.objects.get(id=pk)
+        activity_ticket_type = ActivityTicketType.objects.filter(activity=activity)
+        ticket = ActivityTicket.objects.get(owner=user,type=activity_ticket_type[0])
+        # FIXME
+        return HttpResponse(get_qrcode(ticket),mimetype='image/png')
+    except:
+        return HttpResponseForbidden()
+
 
 @login_required()
 def activity_create(request):
@@ -131,6 +157,7 @@ def activity_create(request):
         if form.is_valid():
             activity = form.save(commit=False)
             activity.creator = request.user
+            activity.lbs = Lbs.objects.create(lat=120.0000,lng=163.000)
             activity.save()
             organizer_list = ActivityOrganizerList.objects.create(activity=activity)
             organizer_single = ActivitySingleOrganizer.objects.create(organizer_list=organizer_list,user=request.user)

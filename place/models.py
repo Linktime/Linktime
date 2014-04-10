@@ -6,11 +6,10 @@ from django.contrib.contenttypes import generic
 # Create your models here.
 
 class Lbs(models.Model):
-    user = models.ForeignKey(User)
     lat = models.FloatField()
     lng = models.FloatField()
     def __unicode__(self):
-        return "%s %f--%f"%(self.user.username,self.lat,self.lng)
+        return "%f--%f"%(self.lat,self.lng)
 
 class Province(models.Model):
     name = models.CharField(max_length=30)

@@ -50,7 +50,7 @@ class SenderObjectsOnlyAuthorization(Authorization):
 class ReceiverObjectsOnlyAuthorization(Authorization):
     def read_list(self, object_list, bundle):
         # This assumes a ``QuerySet`` from ``ModelResource``.
-        return object_list.filter(receiver=bundle.request.user)
+        return object_list.filter(receiver=bundle.request.user,had_read=False)
 
     def read_detail(self, object_list, bundle):
         # Is the requested object owned by the user?
@@ -104,3 +104,11 @@ class AcceptFriendNoticeResource(ModelResource):
         serializer = Serializer(formats=['json',])
         authentication = ApiKeyAuthentication()
         authorization = ReceiverObjectsOnlyAuthorization()
+
+    def full_hydrate(self, bundle):
+        import code;code.interact(local=locals())
+        accept = bundle.data.get("accept")
+        group_name = bundle.data.get("group")
+        if accept:
+            bundle.obj.accept(group_name)
+        return bundle

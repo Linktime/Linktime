@@ -64,7 +64,8 @@
                     {{ form.introduction }}
                 </div>
                 <div class="activity-video-box">在此处添加视频（未开放）</div>
-                <div class="activity-place">地点:<a href="#" id="address"></a>{{form.address}}</div>
+                <div class="activity-place">地点:<a href="#" id="address"></a>{{form.address}}<br>
+                    <div></div>
                 <div class="activity-map" >Map</div>
             </div>
         </div>

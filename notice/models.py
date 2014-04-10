@@ -59,15 +59,20 @@ class NewFriendNotice(Notice):
             afn = IsAcceptFriendNotice.objects.create(receiver=self.sender,sender=self.receiver,event=u"friend_refuse")
 
     def accept(self,receiver_group_name=u"未分组"):
+        if not receiver_group_name:
+            receiver_group_name=u"未分组"
         if self.had_read == False:
-            self.accept = True
-            self.had_read = True
-            self.save()
-            sender_group = Group.objects.get(name=self.group_name,owner=self.sender)
-            sender_group.member.add(self.receiver)
-            receiver_group = Group.objects.get(name=receiver_group_name,owner=self.receiver)
-            receiver_group.member.add(self.sender)
-            afn = IsAcceptFriendNotice.objects.create(receiver=self.sender,sender=self.receiver,event=u"friend_accept")
+            try :
+                sender_group = Group.objects.get(name=self.group_name,owner=self.sender)
+                sender_group.member.add(self.receiver)
+                receiver_group = Group.objects.get(name=receiver_group_name,owner=self.receiver)
+                receiver_group.member.add(self.sender)
+                self.accept = True
+                self.had_read = True
+                self.save()
+                afn = IsAcceptFriendNotice.objects.create(receiver=self.sender,sender=self.receiver,event=u"friend_accept")
+            except Group.DoesNotExist:
+                pass
 
 def user_message(sender,**kwargs):
     if kwargs['created'] == True:

@@ -82,3 +82,16 @@ class ActivityTicketResource(ModelResource):
         serializer = Serializer(formats=['json',])
         authentication = ApiKeyAuthentication()
         authorization = OwnerObjectsOnlyAuthorization()
+
+class ActivityNearbyResource(ModelResource):
+    class Meta:
+        queryset = Activity.objects.select_related().filter(preparing=False)[:5]
+        resource_name = "activity/activity_nearby"
+        allowed_method = ['get']
+        serializer = Serializer(formats=['json',])
+
+    def hydrate(self, bundle):
+        lat = bundle.request.GET.get("lat")
+        lng = bundle.request.GET.get("lng")
+        # TODO
+        return bundle

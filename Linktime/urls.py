@@ -5,6 +5,7 @@ from django.contrib.auth.views import login
 from django.contrib import admin
 
 from api.urls import api
+from activity.views import mobile_get_qrcode
 
 admin.autodiscover()
 
@@ -17,10 +18,12 @@ urlpatterns = patterns('',
     url(r'^activity/',include('activity.urls')),
     url(r'^friend/',include('friend.urls')),
 
+    url(r'^api/v1/activity/(?P<pk>\d*)/qrcode/(?P<tid>\d*)/',mobile_get_qrcode),
     url(r'^api/',include(api.urls)),
 
     url(r'^mobile_register/$','ltuser.api.mobile_register',name='mobile_register'),
     url(r'^mobile_login/$','ltuser.api.mobile_login',name="mobile_login"),
+
     url(r'^test/','ltuser.views.test'),
     # Examples:
     # url(r'^$', 'Linktime.views.home', name='home'),
