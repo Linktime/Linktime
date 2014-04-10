@@ -9,9 +9,15 @@
         </div>
     </div>
     <div class="activity-organizer">主办方：
-        {% for organizer in activity.organizer.all %}
-            {{organizer.get_name}}
-        {% endfor %}
+         {% for organizer in activity.organizer_list_activity.all %}
+                        {% for single in organizer.single.all %}
+                            <a type="button" class="btn btn-default" href="{% url user_space pk=single.ltuser.id %}">{{ single.username }}</a>
+                        {% endfor %}
+                        <br>
+                        {% for team in organizer.single.all %}
+                            {{ team.name }}
+                        {% endfor %}
+                    {% endfor %}
     </div>
     <div class="activity-content">简介:{{activity.abstract}}
     </div>
