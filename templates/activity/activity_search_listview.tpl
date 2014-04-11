@@ -4,6 +4,28 @@
         <div class="col-md-2"></div>
 {% endblock %}
 
+{% block content %}
+
+<form class="form" method="get" action=".">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="input-group">
+                <input class="form-control" placeholder="活动名称" name="activity_name">
+                <span class="input-group-btn">
+                    <button class="btn btn-default">查询</button>
+                </span>
+            </div>
+        </div>
+        <div class="col-md-5 col-md-offset-1">
+            <a href="{% url activity_search_map %}" class="btn btn-default col-md-6">按地理位置查询</a>
+        </div>
+    </div>
+</form>
+
+<div class="activity-list">
+{% if not activitys %}
+    <div class="alert alert-warning">没有搜索到您要查询的活动</div>
+{% endif %}
 {% for activity in activitys %}
     {% include 'activity/activity_list_item.tpl' %}
 {% endfor %}

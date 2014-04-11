@@ -79,8 +79,6 @@
                                 <input class="form-control" type="text" id="suggestId">
                                 <span class="input-group-btn" ><a class="btn btn-default" id="search">定位</a></span>
                             </div>
-                            <div id="searchResultPanel" style="border:1px solid #C0C0C0;width:150px;height:auto;">
-                            </div>
                         </div>
                     </div>
                 </div>

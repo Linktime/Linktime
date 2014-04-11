@@ -61,6 +61,45 @@ class ActivityListView(ListView):
     context_object_name = 'activitys'
     paginate_by = 15
 
+class ActivitySearchListView(ListView):
+    model = Activity
+    template_name = 'activity/activity_search_listview.tpl'
+    context_object_name = 'activitys'
+    paginate_by = 15
+
+    def get_context_data(self, **kwargs):
+        context = super(ActivitySearchListView,self).get_context_data(**kwargs)
+        activity_name = self.request.GET.get("activity_name")
+        activity = self.get_queryset()
+        if activity_name:
+            context['activitys'] = activity.filter(name__contains=activity_name)
+        return context
+
+class ActivitySearchMapListView(ListView):
+    model = Activity
+    template_name = 'activity/activity_search_map_listview.tpl'
+    context_object_name = 'activitys'
+    paginate_by = 15
+
+    def get_context_data(self, **kwargs):
+        context = super(ActivitySearchMapListView,self).get_context_data(**kwargs)
+        lat = self.request.GET.get("lat")
+        lng = self.request.GET.get("lng")
+        activity = self.get_queryset()
+        if lat and lng:
+            lat = float(lat)
+            lng = float(lng)
+            # context['activitys'] = activity.filter(Q(lbs__lat__le=lat))
+            points = [{'lat':lat-0.002,'lng':lng-0.002},
+                     {'lat':lat+0.002,'lng':lng-0.002},
+                     {'lat':lat-0.002,'lng':lng+0.002}]
+            pass
+            context['points'] = points
+            context['search_point'] = {'lat':lat,'lng':lng}
+        else:
+            del context["activitys"]
+        return context
+
 
 class ActivityDetailView(SingleObjectMixinByOrganizerAndPreparing,DetailView):
     model = Activity

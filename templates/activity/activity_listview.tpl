@@ -6,6 +6,12 @@
 
 {% block content %}
         <div class="activity-list">
+        <div class="row">
+            <div class="btn-group col-md-6 col-md-offset-3">
+                <a href="{% url activity_search %}" class="btn btn-default col-md-6">按活动名查询</a>
+                <a href="{% url activity_search_map %}" class="btn btn-default col-md-6">按地理位置查询</a>
+            </div>
+        </div>
 
 {% for activity in activitys %}
     {% include 'activity/activity_list_item.tpl' %}
